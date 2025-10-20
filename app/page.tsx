@@ -350,19 +350,7 @@ export default function HomePage() {
           SMP YPS SINGKOLE - Minggu {currentWeek?.weekNumber} Tahun {currentWeek?.year}
         </p>
 
-        {/* Overall Progress */}
-        <Card className="max-w-md mx-auto">
-          <CardContent className="pt-6">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Progress Keseluruhan</span>
-                <span>{Math.round(getOverallProgress())}%</span>
-              </div>
-              <Progress value={getOverallProgress()} className={`h-3 ${getOverallProgressColor()} shadow-sm`} />
-            </div>
-          </CardContent>
-        </Card>
-
+  
         {/* Action Buttons */}
         <div className="flex justify-center gap-4">
           <Button
@@ -502,21 +490,6 @@ export default function HomePage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      {/* Status Message */}
-                      <div className={`text-center p-2 rounded-lg text-sm font-medium ${
-                        isOverloaded ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
-                        percentage >= 75 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
-                        percentage >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                        percentage >= 25 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                      }`}>
-                        {isOverloaded ? '⚠️ Beban Penuh - Perlu pengaturan ulang' :
-                         percentage >= 75 ? '🔴 Beban Tinggi - Perlu perhatian' :
-                         percentage >= 50 ? '🟡 Beban Sedang - Monitor terus' :
-                         percentage >= 25 ? '🔵 Beban Rendah - Masih Aman' :
-                         '✅ Beban Ringan - Optimal'}
                       </div>
                     </div>
                   </CardContent>
