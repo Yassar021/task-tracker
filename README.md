@@ -1,6 +1,6 @@
-# Codeguide Starter Fullstack
+# SMP YPS SINGKOLE - Aplikasi Manajemen Tugas & Ujian
 
-A modern web application starter template built with Next.js 15, featuring authentication, database integration, and dark mode support.
+Aplikasi full-stack untuk manajemen pemberian tugas dan ujian sumatif di SMP YPS SINGKOLE dengan sistem batas mingguan otomatis, integrasi WhatsApp, dan manajemen data guru.
 
 ## Tech Stack
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LogIn, LogOut, User, UserPlus } from "lucide-react";
 import { useSession, signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,9 +22,14 @@ export function AuthButtons() {
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
+      toast.loading("Sedang keluar...", { id: "signing-out" });
       await signOut();
+      toast.success("Anda telah keluar dari sistem", { id: "signing-out" });
+      window.location.href = "/sign-in";
     } catch (error) {
       console.error("Sign out error:", error);
+      toast.error("Gagal keluar dari sistem", { id: "signing-out" });
+      window.location.href = "/sign-in";
     } finally {
       setIsSigningOut(false);
     }
@@ -93,16 +99,10 @@ export function AuthButtons() {
 
   return (
     <div className="flex items-center gap-2">
-      <Button asChild variant="ghost" size="sm">
+      <Button asChild size="sm">
         <Link href="/sign-in">
           <LogIn className="mr-2 h-4 w-4" />
-          Sign In
-        </Link>
-      </Button>
-      <Button asChild size="sm">
-        <Link href="/sign-up">
-          <UserPlus className="mr-2 h-4 w-4" />
-          Sign Up
+          Masuk
         </Link>
       </Button>
     </div>
@@ -138,15 +138,9 @@ export function HeroAuthButtons() {
   return (
     <div className="flex flex-col sm:flex-row gap-4 justify-center">
       <Button asChild size="lg" className="text-base px-8 py-3">
-        <Link href="/sign-up">
-          <UserPlus className="mr-2 h-5 w-5" />
-          Get Started
-        </Link>
-      </Button>
-      <Button asChild variant="outline" size="lg" className="text-base px-8 py-3">
         <Link href="/sign-in">
           <LogIn className="mr-2 h-5 w-5" />
-          Sign In
+          Masuk ke Dashboard
         </Link>
       </Button>
     </div>

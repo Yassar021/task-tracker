@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tasklist:*)",
+      "Bash(findstr node)",
+      "Bash(taskkill:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run db:push:*)",
+      "Bash(npm run db:studio:*)",
+      "Bash(npx tsx:*)",
+      "Bash(curl:*)",
+      "Bash(task-manager:*)",
+      "Bash(npm run create-admin:*)",
+      "Bash(npm run db:generate:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)",
+      "Bash(node:*)",
+      "Bash(bash:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

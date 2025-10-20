@@ -40,3 +40,22 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Docs
+ADMIN_SETUP.md
+claude_code_zai_env.sh 
+Revisi.md
+prd.md
+IMPLEMENTATION_SUMMARY.md
+test-dashboard-api.sh 
+test-admin-api-fixed.js
+test-admin-api.js
+test-admin-auth.js
+test-dashboard-apis.sh
+test-dashboard-api.sh
+test-dashboard-fetch.js
+debug-class-status.js
+check-db-init.js
+nul 
+
+
