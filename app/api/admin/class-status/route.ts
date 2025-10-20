@@ -7,12 +7,13 @@ import { classes } from '@/db/schema/school';
 
 export async function GET(request: NextRequest) {
   try {
-    // TEMPORARILY BYPASS AUTHENTICATION FOR TESTING
-    // const authResult = await verifyAdmin(request);
-    // if (authResult.error) {
-    //   return NextResponse.json({ error: authResult.error }, { status: authResult.status });
-    // }
-    console.log('🔍 BYPASSING AUTHENTICATION FOR TESTING - Will restore after fix confirmed');
+    // Verify admin authentication
+    const authResult = await verifyAdmin(request);
+    if (authResult.error) {
+      console.log('❌ Admin access denied:', authResult.error);
+      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+    }
+    console.log('✅ Admin authentication verified');
 
     console.log('🔍 Admin class-status API: db status:', !!db);
     console.log('🔍 Admin class-status API: db object:', db ? 'exists' : 'null');
@@ -43,6 +44,8 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+      console.log('🔍 Starting database queries with timeout protection...');
+
       // Get current week info
       const getCurrentWeekInfo = () => {
         const now = new Date();
@@ -54,21 +57,31 @@ export async function GET(request: NextRequest) {
       };
 
       const currentWeek = getCurrentWeekInfo();
+      console.log('📅 Current week:', currentWeek);
 
-      // Get all classes
-      const classesResult = await db
-        .select({
+      // Add timeout protection to database queries
+      const queryTimeout = 10000; // 10 seconds timeout
+
+      // Get all classes with timeout
+      const classesResult = await Promise.race([
+        db.select({
           id: classes.id,
           grade: classes.grade,
           name: classes.name,
           isActive: classes.isActive,
         })
         .from(classes)
-        .where(eq(classes.isActive, true));
+        .where(eq(classes.isActive, true)),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Database query timeout')), queryTimeout)
+        )
+      ]);
 
-      // Get assignments for current week with class assignments
-      // Use same SQL query as homepage for consistency
-      const assignmentsResult = await db.execute(sql`
+      console.log('📊 Classes fetched:', classesResult.length);
+
+      // Get assignments for current week with class assignments and timeout protection
+      const assignmentsResult = await Promise.race([
+        db.execute(sql`
         SELECT
           a.id,
           a.type,
@@ -79,7 +92,11 @@ export async function GET(request: NextRequest) {
         WHERE a.week_number = ${currentWeek.weekNumber}
           AND a.year = ${currentWeek.year}
           AND a.status = 'published'
-      `);
+      `),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Assignments query timeout')), queryTimeout)
+        )
+      ]);
 
       // Calculate status for each class
       const classStatusMap = new Map();
@@ -160,8 +177,10 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({ classStatus: gradeStatuses });
     } catch (dbError) {
-      console.error('Database error:', dbError);
-      // Return mock data on database error
+      console.error('Database error in class-status API:', dbError);
+      console.log('⚠️ Database connection failed, returning mock data');
+
+      // Return mock data on database error (connection timeout, etc.)
       const mockClassStatus = [
         {
           grade: 7,
@@ -181,7 +200,12 @@ export async function GET(request: NextRequest) {
         { grade: 8, total: 6, avgLoad: 45, maxLoad: 100, overloaded: 0 },
         { grade: 9, total: 6, avgLoad: 80, maxLoad: 100, overloaded: 2 },
       ];
-      return NextResponse.json({ classStatus: mockClassStatus });
+
+      return NextResponse.json({
+        classStatus: mockClassStatus,
+        isMockData: true,
+        note: 'Database connection failed, showing mock data'
+      });
     }
   } catch (error) {
     console.error('Error fetching class status:', error);

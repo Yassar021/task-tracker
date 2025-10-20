@@ -13,9 +13,14 @@ const authConfig: any = {
         expiresIn: 60 * 60 * 24 * 7, // 7 days
         updateAge: 60 * 60 * 24, // 1 day
         cookieCache: {
-            enabled: true,
-            maxAge: 5 * 60, // 5 minutes
+            enabled: false, // Disable caching to ensure fresh session checks
         },
+        // Ensure cookies are properly handled
+        cookiePrefix: "better-auth",
+        // Additional security settings
+        sameSite: "lax",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
     },
     account: {
         accountLinking: {
@@ -30,13 +35,13 @@ const authConfig: any = {
 // Only add database adapter if db is available
 if (db) {
     authConfig.database = drizzleAdapter(db, {
-        provider: "pg", // or "mysql", "sqlite"
+        provider: "pg", // PostgreSQL
         schema: {
             user: user,
             account: account,
             session: session,
             verification: verification,
-        }
+        },
     });
 }
 

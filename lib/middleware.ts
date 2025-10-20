@@ -2,36 +2,38 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "./lib/auth";
 
 export async function middleware(request: NextRequest) {
-  const { data: session } = await auth.api.getSession({
-    headers: request.headers,
-  });
+  
+  let session = null;
+  try {
+    // Try multiple methods to get session
+    const result = await auth.api.getSession({
+      headers: request.headers,
+    });
+    session = result?.data;
+  } catch (error) {
+    session = null;
+  }
 
-  // Protected routes that require authentication
-  const protectedPaths = ["/dashboard", "/admin", "/teacher"];
+  // All admin routes require authentication (admin-only system)
+  const protectedPaths = ["/admin"];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
-  // Admin-only routes
-  const adminOnlyPaths = ["/admin"];
-  const isAdminOnlyPath = adminOnlyPaths.some((path) =>
-    request.nextUrl.pathname.startsWith(path)
-  );
-
-  // If trying to access protected routes without session, redirect to sign in
-  if (isProtectedPath && !session) {
-    return NextResponse.redirect(new URL("/sign-in", request.url));
+  // If trying to access protected routes without valid session, redirect to sign in
+  if (isProtectedPath) {
+    if (!session || !session.user) {
+      const response = NextResponse.redirect(new URL("/sign-in", request.url));
+      // Clear any stale cookies
+      response.headers.set('x-clear-auth', 'true');
+      return response;
+    }
   }
 
-  // If trying to access admin routes without admin role, redirect to dashboard
-  if (isAdminOnlyPath && session?.user?.role !== "admin") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
-
-  // If authenticated user tries to access sign-in page, redirect to dashboard
-  if (request.nextUrl.pathname.startsWith("/sign-in") && session) {
-    const redirectUrl = session.user.role === "admin" ? "/admin" : "/dashboard";
-    return NextResponse.redirect(new URL(redirectUrl, request.url));
+  // If authenticated user tries to access sign-in page, redirect to admin
+  if (request.nextUrl.pathname.startsWith("/sign-in") && session?.user) {
+    const response = NextResponse.redirect(new URL("/admin", request.url));
+    return response;
   }
 
   return NextResponse.next();

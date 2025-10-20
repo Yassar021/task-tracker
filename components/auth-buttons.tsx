@@ -23,13 +23,41 @@ export function AuthButtons() {
     setIsSigningOut(true);
     try {
       toast.loading("Sedang keluar...", { id: "signing-out" });
+
+      // Clear all auth cookies first
+      document.cookie.split(";").forEach(cookie => {
+        const [name] = cookie.trim().split("=");
+        if (name.includes("better-auth") || name.includes("session") || name.includes("auth")) {
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/api;domain=${window.location.hostname}`;
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/api;`;
+        }
+      });
+
+      // Call the signOut function
       await signOut();
+
+      // Wait a bit longer to ensure server-side session is cleared
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       toast.success("Anda telah keluar dari sistem", { id: "signing-out" });
-      window.location.href = "/sign-in";
+
+      // Clear localStorage and sessionStorage
+      if (typeof window !== 'undefined') {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      }
+
+      // Force hard redirect to sign-in page with cache busting and no-referrer
+      const timestamp = Date.now();
+      window.location.replace(`/sign-in?t=${timestamp}&logout=1`);
     } catch (error) {
       console.error("Sign out error:", error);
       toast.error("Gagal keluar dari sistem", { id: "signing-out" });
-      window.location.href = "/sign-in";
+      // Still redirect to sign-in even if there's an error
+      const timestamp = Date.now();
+      window.location.replace(`/sign-in?t=${timestamp}&error=1`);
     } finally {
       setIsSigningOut(false);
     }
@@ -79,9 +107,9 @@ export function AuthButtons() {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/dashboard">
+            <Link href="/admin">
               <User className="mr-2 h-4 w-4" />
-              Dashboard
+              Admin Panel
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
@@ -126,9 +154,9 @@ export function HeroAuthButtons() {
     return (
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button asChild size="lg" className="text-base px-8 py-3">
-          <Link href="/dashboard">
+          <Link href="/admin">
             <User className="mr-2 h-5 w-5" />
-            Go to Dashboard
+            Go to Admin Panel
           </Link>
         </Button>
       </div>

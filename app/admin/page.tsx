@@ -104,6 +104,7 @@ export default function AdminDashboard() {
   const [classStatus, setClassStatus] = useState<ClassStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
+  const [accessDenied, setAccessDenied] = useState<boolean>(false);
 
   // Update countdown timer
   useEffect(() => {
@@ -118,16 +119,6 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    console.log('🔍 ADMIN DASHBOARD: useEffect triggered');
-    console.log('🔍 ADMIN DASHBOARD: session status:', session === undefined ? 'loading' : session ? 'exists' : 'none');
-
-    // TEMPORARILY BYPASS AUTHENTICATION FOR TESTING
-    console.log('🔍 ADMIN DASHBOARD: BYPASSING AUTHENTICATION - fetching data directly');
-
-    // If admin, fetch data
-    fetchDashboardData();
-
-    /* ORIGINAL AUTHENTICATION LOGIC - WILL RESTORE LATER
     // If session is still loading, wait
     if (session === undefined) {
       return;
@@ -139,87 +130,73 @@ export default function AdminDashboard() {
       return;
     }
 
-    // If session exists but user is not admin, redirect to dashboard
-    if (session.user.role !== "admin") {
-      window.location.href = "/dashboard";
-      return;
-    }
+    // Check if user is admin by looking up database directly
+    const checkAdminRole = async () => {
+      try {
+        const response = await fetch('/api/auth/check-admin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId: session.user.id }),
+        });
+        const result = await response.json();
 
-    // If admin, fetch data
-    fetchDashboardData();
-    initializeSystem();
-    */
+        if (result.isAdmin) {
+          setAccessDenied(false);
+          // Fetch data only if admin
+          fetchDashboardData();
+        } else {
+          setAccessDenied(true);
+        }
+      } catch (error) {
+        console.error('Error checking admin role:', error);
+        setAccessDenied(true);
+      }
+    };
+
+    checkAdminRole();
   }, [session]);
 
   const fetchDashboardData = async () => {
     try {
-      console.log('🔍 DASHBOARD: Fetching only working API (class-status)...');
-
       // Only fetch class-status API which works
       const classStatusResponse = await fetch('/api/admin/class-status');
       const classStatusData = await classStatusResponse.json();
 
-      console.log('🔍 DASHBOARD: Class Status API response:', classStatusData);
-
-      // Debug: Check if 7-COL data exists in the response
-      if (classStatusData.classStatus) {
-        console.log('🔍 DASHBOARD: ClassStatus array found with', classStatusData.classStatus.length, 'grades');
-
-        const grade7Data = classStatusData.classStatus.find((g: any) => g.grade === 7);
-        if (grade7Data) {
-          console.log('🔍 DASHBOARD: Grade 7 data found:', {
-            total: grade7Data.total,
-            avgLoad: grade7Data.avgLoad,
-            overloaded: grade7Data.overloaded,
-            hasClasses: !!grade7Data.classes,
-            classesCount: grade7Data.classes?.length || 0
-          });
-
-          if (grade7Data.classes) {
-            console.log('🔍 DASHBOARD: All Grade 7 classes:');
-            grade7Data.classes.forEach((cls: any, idx: number) => {
-              console.log(`  ${idx + 1}. ${cls.id}: ${cls.tasks}T/${cls.exams}U = ${cls.load}% (${cls.isOverloaded ? 'OVERLOADED' : 'OK'})`);
-            });
-
-            const collabClass = grade7Data.classes.find((cls: any) => cls.id === '7-COL');
-            if (collabClass) {
-              console.log('🎯 DASHBOARD: 7-COL FOUND - setting state with this data:', collabClass);
-            } else {
-              console.log('❌ DASHBOARD: 7-COL NOT FOUND in Grade 7 classes array');
-            }
-          } else {
-            console.log('❌ DASHBOARD: Grade 7 has no classes array');
-          }
-        } else {
-          console.log('❌ DASHBOARD: Grade 7 data not found in classStatus');
-        }
-      } else {
-        console.log('❌ DASHBOARD: No classStatus array found in response');
-        console.log('Available keys in classStatusData:', Object.keys(classStatusData));
-      }
-
-      console.log('🔍 DASHBOARD: Setting class status state with:', (classStatusData.classStatus || []).length, 'grades');
-
-      // Only set class status data (other features removed)
+      // Set class status data
       setClassStatus(classStatusData.classStatus || []);
-
-      console.log('🔍 DASHBOARD: Class status state updated completed');
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      toast.error("Gagal memuat data dashboard");
+      console.error("Error fetching admin data:", error);
+      toast.error("Gagal memuat data admin");
     } finally {
       setLoading(false);
     }
   };
 
   
+  // Show access denied if user is not admin
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="w-96">
+          <CardContent className="pt-6 text-center">
+            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
+            <p className="text-muted-foreground">Hanya administrator yang dapat mengakses halaman ini.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Show loading while session is being fetched or dashboard data is loading
   if (session === undefined || loading) {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <div>Memuat dashboard admin...</div>
+          <div>Memuat data admin...</div>
         </div>
       </div>
     );

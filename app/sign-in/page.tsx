@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { signIn } from "@/lib/auth-client";
+import { signIn, useSession, getSession } from "@/lib/auth-client";
 import { Loader2, AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,11 +19,33 @@ export default function SignInPage() {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const emailInputRef = useRef<HTMLInputElement>(null);
+    const { data: session, isPending } = useSession();
+
+    // Redirect if already logged in
+    useEffect(() => {
+        if (!isPending && session?.user) {
+            router.replace("/admin");
+        }
+    }, [session, isPending, router]);
 
     // Auto-focus email input on mount
     useEffect(() => {
-        emailInputRef.current?.focus();
-    }, []);
+        if (!isPending) {
+            emailInputRef.current?.focus();
+        }
+    }, [isPending]);
+
+    // Show loading while checking session
+    if (isPending) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <div className="text-center">
+                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                    <p className="text-muted-foreground">Memeriksa sesi...</p>
+                </div>
+            </div>
+        );
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -97,10 +119,10 @@ export default function SignInPage() {
                     icon: <CheckCircle className="h-4 w-4" />,
                 });
 
-                // Small delay before redirect to show success message
+                // Wait a moment for session to be established, then redirect to admin
                 setTimeout(() => {
-                    router.push("/dashboard");
-                }, 500);
+                    router.push("/admin");
+                }, 1000);
             }
         } catch (err) {
             toast.error("Terjadi kesalahan teknis", {
