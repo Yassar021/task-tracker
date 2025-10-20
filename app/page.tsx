@@ -18,6 +18,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { AssignmentForm } from "@/components/forms/assignment-form";
+import { Footer } from "@/components/layout/footer";
 import { toast } from "sonner";
 
 // Helper function for safe JSON parsing
@@ -620,6 +621,9 @@ export default function HomePage() {
           teacherId="temp-teacher-id" // TODO: Get actual teacher ID from session
         />
       )}
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

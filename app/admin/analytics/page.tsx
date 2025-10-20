@@ -38,6 +38,7 @@ import {
   Filter,
   RefreshCw
 } from "lucide-react";
+import { Footer } from "@/components/layout/footer";
 
 // Dummy data - disesain berdasarkan struktur kelas yang ada
 const dummyClasses = [
@@ -651,6 +652,9 @@ export default function AnalyticsPage() {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

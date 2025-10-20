@@ -21,6 +21,7 @@ import {
   Eye,
 } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { Footer } from "@/components/layout/footer";
 import { toast } from "sonner";
 import {
   formatDate,
@@ -491,6 +492,9 @@ export default function Page() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

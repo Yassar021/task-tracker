@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
+import { Footer } from "@/components/layout/footer";
 
 interface Assignment {
   id: string;
@@ -425,6 +426,9 @@ export default function AssignmentsPage() {
           </Button>
         </div>
       )}
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }

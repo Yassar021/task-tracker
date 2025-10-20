@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar, BookOpen } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { Footer } from "@/components/layout/footer";
 import { toast } from "sonner";
 
 interface ClassStatus {
@@ -554,6 +555,9 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
