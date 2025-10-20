@@ -17,7 +17,8 @@ import {
   BookOpen,
   Calendar,
   Users,
-  BarChart3
+  BarChart3,
+  FileText
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
@@ -75,6 +76,11 @@ export function SiteHeader() {
       description: "Monitor tugas dan ujian",
       gradient: "from-blue-500 to-cyan-500"
     }
+    if (pathname.includes('/admin/assignments')) return {
+      title: "Daftar Tugas",
+      description: "Kelola semua tugas dan ujian",
+      gradient: "from-green-500 to-emerald-500"
+    }
     if (pathname.includes('/assignments')) return {
       title: "Tugas & Ujian",
       description: "Kelola tugas pembelajaran",
@@ -98,16 +104,21 @@ export function SiteHeader() {
   }
 
   const getNavigationItems = () => {
-    if (!session?.user?.role) {
+    if (!session?.user?.id) {
       return [];
     }
 
-    if (session.user.role === "admin") {
+    // Check if user is admin using known admin IDs (same logic as admin-auth.ts)
+    const knownAdminIds = [
+      'WfyvCKXv6EW3XHuJ50Ids2oWAsOVup3Z', // admin@ypssingkole.sch.id
+    ];
+
+    const isAdmin = knownAdminIds.includes(session.user.id);
+
+    if (isAdmin) {
       return [
         { href: "/admin", label: "Dashboard", icon: Home },
-        { href: "/admin/teachers", label: "Guru", icon: Users },
-        { href: "/admin/classes", label: "Kelas", icon: BookOpen },
-        { href: "/admin/assignments", label: "Tugas", icon: BookOpen },
+        { href: "/admin/assignments", label: "Tugas", icon: FileText },
         { href: "/admin/analytics", label: "Statistik", icon: BarChart3 },
       ];
     }
@@ -181,7 +192,13 @@ export function SiteHeader() {
                     {session?.user?.email}
                   </p>
                   <p className="text-xs text-muted-foreground capitalize">
-                    {session?.user?.role}
+                    {(() => {
+                      if (!session?.user?.id) return '';
+                      const knownAdminIds = [
+                        'WfyvCKXv6EW3XHuJ50Ids2oWAsOVup3Z', // admin@ypssingkole.sch.id
+                      ];
+                      return knownAdminIds.includes(session.user.id) ? 'Admin' : (session.user.role || 'User');
+                    })()}
                   </p>
                 </div>
               </div>
@@ -211,26 +228,27 @@ export function SiteHeader() {
       {/* Navigation Bar */}
       {session?.user && (
         <div className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center gap-1 px-4 lg:px-6 h-14">
-            {navigationItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <Button
-                  key={item.href}
-                  variant={isActive ? "secondary" : "ghost"}
-                  size="sm"
-                  asChild
-                  className={`h-8 gap-2 ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  <a href={item.href}>
-                    <Icon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{item.label}</span>
-                  </a>
-                </Button>
-              );
-            })}
-            <div className="flex-1"></div>
+          <div className="flex items-center justify-center gap-1 px-4 lg:px-6 h-14">
+            <div className="flex items-center gap-1">
+              {navigationItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.href}
+                    variant={isActive ? "secondary" : "ghost"}
+                    size="sm"
+                    asChild
+                    className={`h-8 gap-2 px-4 ${isActive ? "bg-primary/10 text-primary border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
+                  >
+                    <a href={item.href}>
+                      <Icon className="h-4 w-4" />
+                      <span className="hidden sm:inline font-medium">{item.label}</span>
+                    </a>
+                  </Button>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

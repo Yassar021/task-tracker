@@ -399,45 +399,124 @@ export default function HomePage() {
             📚 Kelas {grade}
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {statusList.map((status) => {
               const totalUsed = status.tasks + status.exams;
               const totalMax = status.maxTasks + status.maxExams;
               const percentage = (totalUsed / totalMax) * 100;
+              const isOverloaded = percentage >= 100;
+
+              const getStatusColor = () => {
+                if (isOverloaded) return 'from-red-500 to-pink-500';
+                if (percentage >= 75) return 'from-orange-500 to-red-500';
+                if (percentage >= 50) return 'from-yellow-500 to-orange-500';
+                if (percentage >= 25) return 'from-blue-500 to-cyan-500';
+                return 'from-green-500 to-emerald-500';
+              };
+
+              const getStatusIcon = () => {
+                if (isOverloaded) return '⚠️';
+                if (percentage >= 75) return '🔴';
+                if (percentage >= 50) return '🟡';
+                if (percentage >= 25) return '🔵';
+                return '✅';
+              };
 
               return (
                 <Card
                   key={`${status.class.id}-${status.updateCounter || 0}`}
-                  className={`relative transition-all duration-500 ease-out ${
+                  className={`relative transition-all duration-500 ease-out hover:shadow-xl ${
                     refreshing ? 'scale-95 opacity-70' : 'scale-100 opacity-100'
-                  } hover:shadow-lg`}
+                  } ${
+                    isOverloaded ? 'ring-2 ring-red-500 ring-opacity-50' : ''
+                  }`}
                 >
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-center">
-                      {status.class.id}
-                    </CardTitle>
-                    <CardDescription className="text-center text-xs">
-                      {status.class.name}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <Progress
-                      value={percentage}
-                      className={`h-3 ${getProgressColor(totalUsed, totalMax)} shadow-sm`}
-                    />
-
-                    <div className="text-xs space-y-1">
-                      <div className="flex justify-between">
-                        <span>Tugas:</span>
-                        <Badge variant={status.tasks >= status.maxTasks ? "destructive" : "secondary"}>
-                          {status.tasks}/{status.maxTasks}
-                        </Badge>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${getStatusColor()} flex items-center justify-center text-white shadow-lg`}>
+                          <span className="text-lg font-bold">
+                            {status.class.id.split('-')[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                            {status.class.name}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Kelas {status.class.id}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex justify-between">
-                        <span>Ujian:</span>
-                        <Badge variant={status.exams >= status.maxExams ? "destructive" : "secondary"}>
-                          {status.exams}/{status.maxExams}
-                        </Badge>
+                      <div className="text-2xl">
+                        {getStatusIcon()}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-4">
+                      {/* Load Percentage Bar */}
+                      <div>
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Beban Tugas</span>
+                          <span className={`text-sm font-bold ${
+                            percentage >= 75 ? 'text-red-600 dark:text-red-400' :
+                            percentage >= 50 ? 'text-orange-600 dark:text-orange-400' :
+                            percentage >= 25 ? 'text-blue-600 dark:text-blue-400' :
+                            'text-green-600 dark:text-green-400'
+                          }`}>
+                            {Math.round(percentage)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              isOverloaded ? 'bg-red-500' :
+                              percentage >= 75 ? 'bg-orange-500' :
+                              percentage >= 50 ? 'bg-yellow-500' :
+                              percentage >= 25 ? 'bg-blue-500' :
+                              'bg-green-500'
+                            }`}
+                            style={{ width: `${Math.min(percentage, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Tasks and Exams Stats */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                            <div>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">Tugas</p>
+                              <p className="text-lg font-bold text-gray-900 dark:text-white">{status.tasks}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                            <div>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">Ujian</p>
+                              <p className="text-lg font-bold text-gray-900 dark:text-white">{status.exams}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Status Message */}
+                      <div className={`text-center p-2 rounded-lg text-sm font-medium ${
+                        isOverloaded ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                        percentage >= 75 ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                        percentage >= 50 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                        percentage >= 25 ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        {isOverloaded ? '⚠️ Beban Penuh - Perlu pengaturan ulang' :
+                         percentage >= 75 ? '🔴 Beban Tinggi - Perlu perhatian' :
+                         percentage >= 50 ? '🟡 Beban Sedang - Monitor terus' :
+                         percentage >= 25 ? '🔵 Beban Rendah - Masih Aman' :
+                         '✅ Beban Ringan - Optimal'}
                       </div>
                     </div>
                   </CardContent>

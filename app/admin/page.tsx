@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar } from "lucide-react";
+import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar, BookOpen } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 
@@ -353,148 +353,202 @@ export default function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Class Status Overview */}
+        {/* All Classes Overview */}
         <div className="space-y-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-6">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg">
               <School className="h-5 w-5 text-white" />
             </div>
-            <h2 className="text-2xl font-outfit font-bold text-gray-900 dark:text-white">Status Beban Kelas per Tingkatan</h2>
+            <div>
+              <h2 className="text-2xl font-outfit font-bold text-gray-900 dark:text-white">Semua Kelas</h2>
+              <p className="text-sm font-inter text-gray-600 dark:text-gray-400">
+                Monitoring beban tugas dan ujian untuk setiap kelas
+              </p>
+            </div>
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {classStatus.map((gradeStatus) => {
-              console.log(`🔍 RENDER: Rendering Grade ${gradeStatus.grade} card:`, {
-                total: gradeStatus.total,
-                avgLoad: gradeStatus.avgLoad,
-                classesCount: gradeStatus.classes?.length || 0,
-                hasClasses: !!gradeStatus.classes
-              });
+              // Calculate statistics for this grade
+              const classes = gradeStatus.classes || [];
+              const totalTasks = classes.reduce((sum, cls) => sum + cls.tasks, 0);
+              const totalExams = classes.reduce((sum, cls) => sum + cls.exams, 0);
+              const averageLoad = classes.length > 0 ? ((totalTasks + totalExams) / (classes.length * 4)) * 100 : 0;
+              const averageTasks = classes.length > 0 ? totalTasks / classes.length : 0;
+              const averageExams = classes.length > 0 ? totalExams / classes.length : 0;
+              const overloadedClasses = classes.filter(cls => ((cls.tasks + cls.exams) / 4) * 100 >= 100).length;
 
-              // Get status message based on overloaded classes
-              const getStatusMessage = () => {
-                if (gradeStatus.overloaded > 0) {
-                  return `⚠️ ${gradeStatus.overloaded} kelas penuh`;
-                } else if (gradeStatus.avgLoad >= 50) {
-                  return "🟡 Beberapa kelas hampir penuh";
-                } else {
-                  return "✅ Semua kelas aman";
-                }
+              // Find highest load class
+              const classLoads = classes.map(cls => ({
+                ...cls,
+                loadPercentage: ((cls.tasks + cls.exams) / 4) * 100
+              }));
+              const highestLoadClass = classLoads.reduce((max, cls) =>
+                cls.loadPercentage > max.loadPercentage ? cls : max,
+                classLoads[0] || { loadPercentage: 0, id: '-', name: '-', tasks: 0, exams: 0 }
+              );
+
+              // Determine overall status
+              const getOverallStatus = () => {
+                if (overloadedClasses > 0) return { text: 'Perlu perhatian', color: 'red', icon: '!' };
+                if (averageLoad >= 75) return { text: 'Beban tinggi', color: 'orange', icon: '!' };
+                if (averageLoad >= 50) return { text: 'Beban sedang', color: 'yellow', icon: '!' };
+                return { text: 'Semua kelas aman', color: 'green', icon: '✓' };
               };
 
-              const getStatusColor = () => {
-                if (gradeStatus.overloaded > 0) return "text-red-600 dark:text-red-400";
-                if (gradeStatus.avgLoad >= 50) return "text-yellow-600 dark:text-yellow-400";
-                return "text-green-600 dark:text-green-400";
-              };
+              const overallStatus = getOverallStatus();
+              const maxLoad = Math.round(highestLoadClass.loadPercentage);
 
               return (
-              <Card key={gradeStatus.grade} className={`shadow-lg border-2 ${
-                gradeStatus.overloaded > 0
-                  ? 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/10'
-                  : gradeStatus.avgLoad >= 50
-                  ? 'border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/10'
-                  : 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/10'
-              }`}>
-                <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center ${
-                        gradeStatus.overloaded > 0
-                          ? 'bg-red-100 dark:bg-red-900/30'
-                          : gradeStatus.avgLoad >= 50
-                          ? 'bg-yellow-100 dark:bg-yellow-900/30'
-                          : 'bg-green-100 dark:bg-green-900/30'
-                      }`}>
-                        <span className="text-lg font-bold">
-                          {gradeStatus.overloaded > 0 ? '!' : gradeStatus.avgLoad >= 50 ? '!' : '✓'}
+                <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                  {/* Header Section */}
+                  <div className="p-6 pb-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        {/* Status Icon */}
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                          overallStatus.color === 'green' ? 'bg-green-500' :
+                          overallStatus.color === 'yellow' ? 'bg-yellow-500' :
+                          overallStatus.color === 'orange' ? 'bg-orange-500' :
+                          'bg-red-500'
+                        }`}>
+                          {overallStatus.icon}
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                            Kelas {gradeStatus.grade}
+                          </h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {classes.length} kelas • Rata-rata beban: {Math.round(averageLoad)}%
+                          </p>
+                        </div>
+                      </div>
+                      {/* Badge */}
+                      <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
+                        <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                          {overloadedClasses} Penuh
                         </span>
                       </div>
-                      <div>
-                        <CardTitle className="text-xl font-outfit font-bold text-gray-900 dark:text-white">Kelas {gradeStatus.grade}</CardTitle>
-                        <CardDescription className="text-sm font-inter text-gray-600 dark:text-gray-300">
-                          {gradeStatus.total} kelas • Rata-rata beban: {gradeStatus.avgLoad}%
-                        </CardDescription>
-                      </div>
                     </div>
-                    <Badge variant={gradeStatus.overloaded > 0 ? "destructive" : "secondary"} className="text-xs">
-                      {gradeStatus.overloaded} Penuh
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Status Message */}
-                  <div className={`text-sm font-medium ${getStatusColor()}`}>
-                    {getStatusMessage()}
-                  </div>
 
-                  {/* Load Metrics */}
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                    <div className="text-center">
-                      <div className="text-3xl font-outfit font-bold text-gray-900 dark:text-white">{gradeStatus.avgLoad}%</div>
-                      <div className="text-sm font-inter text-gray-600 dark:text-gray-400 font-medium">Rata-rata Beban</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-3xl font-outfit font-bold text-gray-900 dark:text-white">{gradeStatus.maxLoad}%</div>
-                      <div className="text-sm font-inter text-gray-600 dark:text-gray-400 font-medium">Beban Tertinggi</div>
+                    {/* Overall Status Bar */}
+                    <div className={`w-full rounded-lg p-3 mb-6 flex items-center gap-2 ${
+                      overallStatus.color === 'green' ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300' :
+                      overallStatus.color === 'yellow' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300' :
+                      overallStatus.color === 'orange' ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300' :
+                      'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'
+                    }`}>
+                      <span className="text-lg font-bold">{overallStatus.icon}</span>
+                      <span className="text-sm font-medium">{overallStatus.text}</span>
                     </div>
                   </div>
 
-                  {/* Individual Classes */}
-                  <div className="space-y-3">
-                    <div className="text-sm font-outfit font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                      📚 Status Per Kelas (Maks 2 Tugas + 2 Ujian)
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {gradeStatus.classes?.map((cls, idx) => {
-                        console.log(`🔍 RENDER: Rendering class ${idx + 1}: ${cls.id} - ${cls.tasks}T/${cls.exams}U = ${cls.load}% (${cls.isOverloaded ? 'RED' : cls.load >= 50 ? 'YELLOW' : 'GREEN'})`);
-
-                        return (
-                        <div
-                          key={cls.id}
-                          className={`group relative px-3 py-2 rounded-full text-sm font-outfit font-medium border-2 transition-all hover:scale-105 shadow-sm hover:shadow-md ${
-                            cls.isOverloaded
-                              ? 'bg-red-100 text-red-800 border-red-300 hover:bg-red-200'
-                              : cls.load >= 50
-                              ? 'bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200'
-                              : 'bg-green-100 text-green-800 border-green-300 hover:bg-green-200'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-base">{cls.isOverloaded ? '⚠️' : cls.load >= 50 ? '!' : '✓'}</span>
-                            <span className="font-semibold">{cls.name}</span>
-                            <span className="font-bold font-mono bg-black/10 px-1 rounded">{cls.load}%</span>
-                          </div>
-
-                          {/* Enhanced Tooltip */}
-                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-3 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 whitespace-nowrap pointer-events-none z-20 shadow-xl">
-                            <div className="font-outfit font-semibold text-base mb-2">{cls.name}</div>
-                            <div className="space-y-1 text-xs">
-                              <div className="flex justify-between gap-4">
-                                <span>📝 Tugas:</span>
-                                <span className="font-mono font-semibold">{cls.tasks}/2</span>
-                              </div>
-                              <div className="flex justify-between gap-4">
-                                <span>📝 Ujian:</span>
-                                <span className="font-mono font-semibold">{cls.exams}/2</span>
-                              </div>
-                              <div className="flex justify-between gap-4 pt-1 border-t border-gray-700">
-                                <span>📊 Total:</span>
-                                <span className="font-mono font-semibold">{cls.tasks + cls.exams}/4 slot</span>
-                              </div>
-                              {cls.isOverloaded && (
-                                <div className="text-red-300 font-semibold mt-2 text-center">⚠️ Kelas penuh!</div>
-                              )}
+                  {/* Key Metrics Section */}
+                  <div className="px-6 pb-6">
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      {/* Average Load Metric */}
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm">
+                        <div className="flex items-center justify-between h-full">
+                          <div className="flex-1">
+                            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                              Rata-rata Beban
+                            </p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                                {Math.round(averageLoad)}
+                              </span>
+                              <span className="text-lg text-gray-500 dark:text-gray-400">%</span>
                             </div>
-                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-gray-900"></div>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ml-3">
+                            <BookOpen className="w-6 h-6 text-white" />
                           </div>
                         </div>
-                        );
-                      })}
+                      </div>
+
+                      {/* Highest Load Metric */}
+                      <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-4 border border-orange-200 dark:border-orange-700 shadow-sm">
+                        <div className="flex items-center justify-between h-full">
+                          <div className="flex-1">
+                            <p className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-1">
+                              Beban Tertinggi
+                            </p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                                {maxLoad}
+                              </span>
+                              <span className="text-lg text-orange-500 dark:text-orange-500">%</span>
+                            </div>
+                            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">
+                              {highestLoadClass.id}
+                            </p>
+                          </div>
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg ml-3">
+                            <AlertCircle className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status Per Kelas Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
+                          Status Per Kelas
+                        </h4>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          (Maks 2 Tugas + 2 Ujian)
+                        </span>
+                      </div>
+
+                      <div className="space-y-2">
+                        {classes.map((cls) => {
+                          const totalSlots = cls.tasks + cls.exams;
+                          const loadPercentage = ((cls.tasks + cls.exams) / 4) * 100;
+
+                          const getStatusConfig = () => {
+                            if (totalSlots === 0) return { color: 'green', icon: '✓', textColor: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-50 dark:bg-green-900/20', borderColor: 'border-green-200 dark:border-green-800' };
+                            if (totalSlots === 1) return { color: 'blue', icon: '✓', textColor: 'text-blue-700 dark:text-blue-300', bgColor: 'bg-blue-50 dark:bg-blue-900/20', borderColor: 'border-blue-200 dark:border-blue-800' };
+                            if (totalSlots === 2) return { color: 'yellow', icon: '!', textColor: 'text-yellow-700 dark:text-yellow-300', bgColor: 'bg-yellow-50 dark:bg-yellow-900/20', borderColor: 'border-yellow-200 dark:border-yellow-800' };
+                            if (totalSlots === 3) return { color: 'orange', icon: '!', textColor: 'text-orange-700 dark:text-orange-300', bgColor: 'bg-orange-50 dark:bg-orange-900/20', borderColor: 'border-orange-200 dark:border-orange-800' };
+                            return { color: 'red', icon: '!', textColor: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-50 dark:bg-red-900/20', borderColor: 'border-red-200 dark:border-red-800' };
+                          };
+
+                          const statusConfig = getStatusConfig();
+
+                          return (
+                            <div
+                              key={cls.id}
+                              className={`flex items-center justify-between p-3 rounded-lg border ${statusConfig.bgColor} ${statusConfig.borderColor} ${statusConfig.textColor} transition-all duration-200 hover:shadow-sm cursor-pointer`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                                  statusConfig.color === 'green' ? 'bg-green-500' :
+                                  statusConfig.color === 'blue' ? 'bg-blue-500' :
+                                  statusConfig.color === 'yellow' ? 'bg-yellow-500' :
+                                  statusConfig.color === 'orange' ? 'bg-orange-500' :
+                                  'bg-red-500'
+                                }`}>
+                                  {statusConfig.icon}
+                                </div>
+                                <div>
+                                  <div className="font-bold text-sm">{cls.id}</div>
+                                  <div className="text-xs opacity-75">{cls.name}</div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold text-lg">{Math.round(loadPercentage)}%</div>
+                                <div className="text-xs opacity-75">
+                                  {cls.tasks}T • {cls.exams}U
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </Card>
               );
             })}
           </div>
