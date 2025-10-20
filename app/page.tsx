@@ -278,56 +278,56 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-6 max-w-md mx-auto">
+        <div className="text-center space-y-4 sm:space-y-6 max-w-sm sm:max-w-md mx-auto">
           {/* Animated Logo */}
           <div className="relative">
-            <div className="w-20 h-20 mx-auto relative">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto relative">
               {/* Outer ring */}
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 animate-pulse"></div>
               <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 animate-spin"></div>
               <div className="absolute inset-4 rounded-full bg-white flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-blue-600 animate-bounce" />
+                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
               </div>
             </div>
 
             {/* Orbiting dots */}
             <div className="absolute inset-0 animate-spin">
-              <div className="absolute top-0 left-1/2 w-2 h-2 bg-blue-500 rounded-full transform -translate-x-1/2"></div>
-              <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-indigo-500 rounded-full transform -translate-x-1/2"></div>
-              <div className="absolute left-0 top-1/2 w-2 h-2 bg-cyan-500 rounded-full transform -translate-y-1/2"></div>
-              <div className="absolute right-0 top-1/2 w-2 h-2 bg-blue-400 rounded-full transform -translate-y-1/2"></div>
+              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full transform -translate-x-1/2"></div>
+              <div className="absolute bottom-0 left-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-indigo-500 rounded-full transform -translate-x-1/2"></div>
+              <div className="absolute left-0 top-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-500 rounded-full transform -translate-y-1/2"></div>
+              <div className="absolute right-0 top-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full transform -translate-y-1/2"></div>
             </div>
           </div>
 
           {/* Loading text with animation */}
-          <div className="space-y-3">
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent animate-pulse">
+          <div className="space-y-2 sm:space-y-3">
+            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent animate-pulse">
               Memuat Data...
             </h2>
-            <p className="text-gray-600 animate-pulse">
+            <p className="text-sm sm:text-base text-gray-600 animate-pulse">
               Mengambil informasi kelas dan tugas
             </p>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
             <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse"
                  style={{ width: '70%' }}></div>
           </div>
 
           {/* Loading dots animation */}
-          <div className="flex justify-center space-x-2">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-3 h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-3 h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <div className="flex justify-center space-x-1.5 sm:space-x-2">
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
           </div>
 
           {/* Floating elements */}
-          <div className="relative h-20">
-            <div className="absolute top-0 left-1/4 text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>📚</div>
-            <div className="absolute top-0 right-1/4 text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>📝</div>
-            <div className="absolute bottom-0 left-1/3 text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>✏️</div>
-            <div className="absolute bottom-0 right-1/3 text-2xl animate-bounce" style={{ animationDelay: '600ms' }}>🎯</div>
+          <div className="relative h-16 sm:h-20">
+            <div className="absolute top-0 left-1/4 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>📚</div>
+            <div className="absolute top-0 right-1/4 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>📝</div>
+            <div className="absolute bottom-0 left-1/3 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>✏️</div>
+            <div className="absolute bottom-0 right-1/3 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '600ms' }}>🎯</div>
           </div>
 
           {/* Subtle hint */}
@@ -340,54 +340,55 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">
+      <div className="text-center space-y-3 sm:space-y-4">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
           📚 Monitoring Tugas & Ujian
         </h1>
-        <p className="text-xl text-muted-foreground">
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground">
           SMP YPS SINGKOLE - Minggu {currentWeek?.weekNumber} Tahun {currentWeek?.year}
         </p>
 
-  
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 px-2">
           <Button
             onClick={() => setShowInputForm(true)}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto text-sm px-3 py-2 h-9 sm:h-10 sm:px-4"
           >
-            <Lock className="h-4 w-4" />
-            Input Tugas/Ujian
+            <Lock className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Input Tugas/Ujian</span>
+            <span className="sm:hidden">Input</span>
           </Button>
           <Button
             variant="outline"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="gap-2 relative"
+            className="gap-2 relative w-full sm:w-auto text-sm px-3 py-2 h-9 sm:h-10 sm:px-4"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${refreshing ? 'animate-spin' : ''}`} />
             {refreshing ? 'Memuat...' : 'Refresh'}
           </Button>
           <Button
             variant="outline"
             onClick={() => window.location.href = '/admin'}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto text-sm px-3 py-2 h-9 sm:h-10 sm:px-4"
           >
-            <Settings className="h-4 w-4" />
-            Admin Panel
+            <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Admin Panel</span>
+            <span className="sm:hidden">Admin</span>
           </Button>
         </div>
       </div>
 
       {/* Classes by Grade */}
       {Object.entries(classesByGrade).map(([grade, statusList]) => (
-        <div key={grade} className="space-y-4">
-          <h2 className="text-2xl font-bold text-center">
+        <div key={grade} className="space-y-3 sm:space-y-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-center">
             📚 Kelas {grade}
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {statusList.map((status) => {
               const totalUsed = status.tasks + status.exams;
               const totalMax = status.maxTasks + status.maxExams;
@@ -419,35 +420,35 @@ export default function HomePage() {
                     isOverloaded ? 'ring-2 ring-red-500 ring-opacity-50' : ''
                   }`}
                 >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${getStatusColor()} flex items-center justify-center text-white shadow-lg`}>
-                          <span className="text-lg font-bold">
+                  <CardHeader className="pb-3 sm:pb-4 p-3 sm:p-6">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br ${getStatusColor()} flex items-center justify-center text-white shadow-lg flex-shrink-0`}>
+                          <span className="text-base sm:text-lg font-bold">
                             {status.class.id.split('-')[0]}
                           </span>
                         </div>
-                        <div>
-                          <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-bold text-sm sm:text-base lg:text-lg text-gray-900 dark:text-white truncate">
                             {status.class.name}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             Kelas {status.class.id}
                           </p>
                         </div>
                       </div>
-                      <div className="text-2xl">
+                      <div className="text-xl sm:text-2xl flex-shrink-0">
                         {getStatusIcon()}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="space-y-4">
+                  <CardContent className="pt-0 p-3 sm:p-6">
+                    <div className="space-y-3 sm:space-y-4">
                       {/* Load Percentage Bar */}
                       <div>
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Beban Tugas</span>
-                          <span className={`text-sm font-bold ${
+                          <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">Beban Tugas</span>
+                          <span className={`text-xs sm:text-sm font-bold ${
                             percentage >= 75 ? 'text-red-600 dark:text-red-400' :
                             percentage >= 50 ? 'text-orange-600 dark:text-orange-400' :
                             percentage >= 25 ? 'text-blue-600 dark:text-blue-400' :
@@ -456,9 +457,9 @@ export default function HomePage() {
                             {Math.round(percentage)}%
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 sm:h-2">
                           <div
-                            className={`h-2 rounded-full transition-all duration-500 ${
+                            className={`h-1.5 sm:h-2 rounded-full transition-all duration-500 ${
                               isOverloaded ? 'bg-red-500' :
                               percentage >= 75 ? 'bg-orange-500' :
                               percentage >= 50 ? 'bg-yellow-500' :
@@ -471,22 +472,22 @@ export default function HomePage() {
                       </div>
 
                       {/* Tasks and Exams Stats */}
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                            <div>
+                      <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
                               <p className="text-xs text-gray-600 dark:text-gray-400">Tugas</p>
-                              <p className="text-lg font-bold text-gray-900 dark:text-white">{status.tasks}</p>
+                              <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">{status.tasks}</p>
                             </div>
                           </div>
                         </div>
-                        <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                            <div>
+                        <div className="bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 border border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-1 sm:gap-2">
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
                               <p className="text-xs text-gray-600 dark:text-gray-400">Ujian</p>
-                              <p className="text-lg font-bold text-gray-900 dark:text-white">{status.exams}</p>
+                              <p className="text-base sm:text-lg font-bold text-gray-900 dark:text-white truncate">{status.exams}</p>
                             </div>
                           </div>
                         </div>
@@ -502,11 +503,11 @@ export default function HomePage() {
 
       {/* Input Form Modal */}
       {showInputForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-md mx-4">
-            <CardHeader>
-              <CardTitle>Input Tugas/Ujian</CardTitle>
-              <CardDescription>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md mx-auto">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Input Tugas/Ujian</CardTitle>
+              <CardDescription className="text-sm">
                 Masukkan kode untuk melanjutkan
               </CardDescription>
             </CardHeader>
@@ -519,6 +520,7 @@ export default function HomePage() {
                       key={grade}
                       variant={selectedGrade === grade ? "default" : "outline"}
                       onClick={() => setSelectedGrade(grade)}
+                      className="text-xs sm:text-sm h-8 sm:h-10"
                     >
                       Kelas {grade}
                     </Button>
@@ -533,11 +535,11 @@ export default function HomePage() {
                   value={inputCode}
                   onChange={(e) => setInputCode(e.target.value)}
                   placeholder="Masukkan kode"
-                  className="w-full p-2 border rounded"
+                  className="w-full p-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant="outline"
                   onClick={() => {
@@ -545,11 +547,11 @@ export default function HomePage() {
                     setSelectedGrade('');
                     setInputCode('');
                   }}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                 >
                   Batal
                 </Button>
-                <Button onClick={handleInputSubmit} className="flex-1">
+                <Button onClick={handleInputSubmit} className="flex-1 text-sm">
                   Lanjut
                 </Button>
               </div>

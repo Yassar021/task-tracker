@@ -182,47 +182,47 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
             📊 Analytics Dashboard
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Monitoring dan Analisis Beban Tugas & Ujian
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3">
           <Button
             variant="outline"
             onClick={handleRefresh}
             disabled={refreshing}
-            className="gap-2"
+            className="gap-2 h-9 px-3 sm:h-10 sm:px-4 text-xs sm:text-sm"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`h-3 w-3 sm:h-4 sm:w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
           <Button
             variant="outline"
             onClick={handleExport}
-            className="gap-2"
+            className="gap-2 h-9 px-3 sm:h-10 sm:px-4 text-xs sm:text-sm"
           >
-            <Download className="h-4 w-4" />
-            Export
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Export</span>
           </Button>
         </div>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tugas</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+        <Card className="p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0 pt-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Tugas</CardTitle>
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
               {stats.totalTasks}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -231,13 +231,13 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Ujian</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0 pt-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Ujian</CardTitle>
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
               {stats.totalExams}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -246,13 +246,13 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Rata-rata Beban</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0 pt-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Rata-rata Beban</CardTitle>
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.avgLoad}%</div>
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold">{stats.avgLoad}%</div>
             <div className="flex items-center gap-1 text-xs">
               <TrendingUp className="h-3 w-3 text-green-500" />
               <span className="text-green-500">+5%</span>
@@ -260,13 +260,13 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kelas Overload</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0 pt-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Kelas Overload</CardTitle>
+            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold text-red-600 dark:text-red-400">
               {stats.overloadClasses}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -275,13 +275,13 @@ export default function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kelas Aman</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+        <Card className="p-3 sm:p-4">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-0 pt-0">
+            <CardTitle className="text-xs sm:text-sm font-medium">Kelas Aman</CardTitle>
+            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <CardContent className="px-0 pb-0">
+            <div className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400">
               {stats.normalClasses}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -292,14 +292,15 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-4 items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Filter Tingkatan:</span>
-          <div className="flex gap-2">
+          <span className="text-sm font-medium whitespace-nowrap">Filter Tingkatan:</span>
+          <div className="flex flex-wrap gap-1 sm:gap-2">
             <Button
               variant={selectedGrade === "all" ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedGrade("all")}
+              className="text-xs px-2 py-1 h-7 sm:h-8 sm:px-3"
             >
               Semua
             </Button>
@@ -307,6 +308,7 @@ export default function AnalyticsPage() {
               variant={selectedGrade === "7" ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedGrade("7")}
+              className="text-xs px-2 py-1 h-7 sm:h-8 sm:px-3"
             >
               Kelas 7
             </Button>
@@ -314,6 +316,7 @@ export default function AnalyticsPage() {
               variant={selectedGrade === "8" ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedGrade("8")}
+              className="text-xs px-2 py-1 h-7 sm:h-8 sm:px-3"
             >
               Kelas 8
             </Button>
@@ -321,6 +324,7 @@ export default function AnalyticsPage() {
               variant={selectedGrade === "9" ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedGrade("9")}
+              className="text-xs px-2 py-1 h-7 sm:h-8 sm:px-3"
             >
               Kelas 9
             </Button>
@@ -329,47 +333,54 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Charts */}
-      <Tabs defaultValue="distribution" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="distribution" className="gap-2">
-            <PieChartIcon className="h-4 w-4" />
-            Distribusi Beban
+      <Tabs defaultValue="distribution" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 h-auto p-1">
+          <TabsTrigger value="distribution" className="gap-1 sm:gap-2 flex-col sm:flex-row text-xs sm:text-sm py-2 px-2 sm:px-3 h-auto">
+            <PieChartIcon className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Distribusi Beban</span>
+            <span className="sm:hidden">Distribusi</span>
           </TabsTrigger>
-          <TabsTrigger value="comparison" className="gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Perbandingan Kelas
+          <TabsTrigger value="comparison" className="gap-1 sm:gap-2 flex-col sm:flex-row text-xs sm:text-sm py-2 px-2 sm:px-3 h-auto">
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Perbandingan Kelas</span>
+            <span className="sm:hidden">Perbandingan</span>
           </TabsTrigger>
-          <TabsTrigger value="trends" className="gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Trend Analysis
+          <TabsTrigger value="trends" className="gap-1 sm:gap-2 flex-col sm:flex-row text-xs sm:text-sm py-2 px-2 sm:px-3 h-auto">
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Trend Analysis</span>
+            <span className="sm:hidden">Trends</span>
           </TabsTrigger>
-          <TabsTrigger value="tasks-exams" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Tugas vs Ujian
+          <TabsTrigger value="tasks-exams" className="gap-1 sm:gap-2 flex-col sm:flex-row text-xs sm:text-sm py-2 px-2 sm:px-3 h-auto">
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Tugas vs Ujian</span>
+            <span className="sm:hidden">Tugas/Ujian</span>
           </TabsTrigger>
         </TabsList>
 
         {/* Distribution Chart */}
-        <TabsContent value="distribution" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <TabsContent value="distribution" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             {/* Load Distribution Pie Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribusi Beban Keseluruhan</CardTitle>
-                <CardDescription>
+            <Card className="p-4 sm:p-6">
+              <CardHeader className="pb-4 px-0 pt-0">
+                <CardTitle className="text-lg sm:text-xl">Distribusi Beban Keseluruhan</CardTitle>
+                <CardDescription className="text-sm">
                   Persentase kelas berdasarkan tingkat beban
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+              <CardContent className="px-0 pb-0">
+                <ResponsiveContainer width="100%" height={250} minHeight={200}>
                   <PieChart>
                     <Pie
                       data={prepareLoadDistribution()}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
+                      label={({ name, percent }) => {
+                        const displayName = name.length > 15 ? name.substring(0, 12) + "..." : name;
+                        return `${displayName} ${(percent * 100).toFixed(0)}%`;
+                      }}
+                      outerRadius={60}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -384,21 +395,21 @@ export default function AnalyticsPage() {
             </Card>
 
             {/* Grade Distribution Bar Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribusi Per Tingkatan</CardTitle>
-                <CardDescription>
+            <Card className="p-4 sm:p-6">
+              <CardHeader className="pb-4 px-0 pt-0">
+                <CardTitle className="text-lg sm:text-xl">Distribusi Per Tingkatan</CardTitle>
+                <CardDescription className="text-sm">
                   Rata-rata beban dan aktivitas per kelas
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
+              <CardContent className="px-0 pb-0">
+                <ResponsiveContainer width="100%" height={250} minHeight={200}>
                   <BarChart data={prepareGradeDistribution()}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="grade" />
-                    <YAxis />
+                    <XAxis dataKey="grade" fontSize={12} />
+                    <YAxis fontSize={12} />
                     <Tooltip />
-                    <Legend />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
                     <Bar dataKey="avgLoad" fill={COLORS.grade7} name="Avg Beban (%)" />
                     <Bar dataKey="totalTasks" fill={COLORS.tasks} name="Total Tugas" />
                     <Bar dataKey="totalExams" fill={COLORS.exams} name="Total Ujian" />
@@ -410,22 +421,26 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         {/* Top Classes Comparison */}
-        <TabsContent value="comparison" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>10 Kelas dengan Beban Tertinggi</CardTitle>
-              <CardDescription>
+        <TabsContent value="comparison" className="space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
+            <CardHeader className="pb-4 px-0 pt-0">
+              <CardTitle className="text-lg sm:text-xl">10 Kelas dengan Beban Tertinggi</CardTitle>
+              <CardDescription className="text-sm">
                 Detail kelas dengan beban tertinggi minggu ini
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={prepareTopClasses()} layout="horizontal">
+            <CardContent className="px-0 pb-0">
+              <ResponsiveContainer width="100%" height={300} minHeight={250}>
+                <BarChart
+                  data={prepareTopClasses()}
+                  layout="horizontal"
+                  margin={{ top: 5, right: 30, left: 60, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="id" type="category" width={100} />
+                  <XAxis type="number" fontSize={12} />
+                  <YAxis dataKey="id" type="category" width={60} fontSize={12} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar dataKey="load" fill={COLORS.overload} name="Beban (%)" />
                   <Bar dataKey="tasks" fill={COLORS.tasks} name="Tugas" />
                   <Bar dataKey="exams" fill={COLORS.exams} name="Ujian" />
@@ -436,28 +451,35 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         {/* Trend Analysis */}
-        <TabsContent value="trends" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Trend Beban 6 Minggu Terakhir</CardTitle>
-              <CardDescription>
+        <TabsContent value="trends" className="space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
+            <CardHeader className="pb-4 px-0 pt-0">
+              <CardTitle className="text-lg sm:text-xl">Trend Beban 6 Minggu Terakhir</CardTitle>
+              <CardDescription className="text-sm">
                 Perkembangan rata-rata beban per tingkatan
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
+            <CardContent className="px-0 pb-0">
+              <ResponsiveContainer width="100%" height={300} minHeight={250}>
                 <LineChart data={historicalData}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="week" />
-                  <YAxis />
+                  <XAxis
+                    dataKey="week"
+                    fontSize={10}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis fontSize={12} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '11px' }} />
                   <Line
                     type="monotone"
                     dataKey="overall"
                     stroke="#8b5cf6"
                     strokeWidth={2}
                     name="Rata-rata"
+                    dot={false}
                   />
                   <Line
                     type="monotone"
@@ -465,6 +487,7 @@ export default function AnalyticsPage() {
                     stroke={COLORS.grade7}
                     strokeWidth={2}
                     name="Kelas 7"
+                    dot={false}
                   />
                   <Line
                     type="monotone"
@@ -472,6 +495,7 @@ export default function AnalyticsPage() {
                     stroke={COLORS.grade8}
                     strokeWidth={2}
                     name="Kelas 8"
+                    dot={false}
                   />
                   <Line
                     type="monotone"
@@ -479,6 +503,7 @@ export default function AnalyticsPage() {
                     stroke={COLORS.grade9}
                     strokeWidth={2}
                     name="Kelas 9"
+                    dot={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -486,72 +511,72 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Additional Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Tingkat Pertumbuhan</CardTitle>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            <Card className="p-3 sm:p-4">
+              <CardHeader className="pb-3 px-0 pt-0">
+                <CardTitle className="text-base sm:text-lg">Tingkat Pertumbuhan</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0 pb-0">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 7:</span>
+                    <span className="text-xs sm:text-sm">Kelas 7:</span>
                     <div className="flex items-center gap-1 text-green-500">
-                      <TrendingUp className="h-4 w-4" />
-                      <span className="font-medium">+9.2%</span>
+                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="font-medium text-xs sm:text-sm">+9.2%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 8:</span>
+                    <span className="text-xs sm:text-sm">Kelas 8:</span>
                     <div className="flex items-center gap-1 text-green-500">
-                      <TrendingUp className="h-4 w-4" />
-                      <span className="font-medium">+21.4%</span>
+                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="font-medium text-xs sm:text-sm">+21.4%</span>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 9:</span>
+                    <span className="text-xs sm:text-sm">Kelas 9:</span>
                     <div className="flex items-center gap-1 text-green-500">
-                      <TrendingUp className="h-4 w-4" />
-                      <span className="font-medium">+25.0%</span>
+                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="font-medium text-xs sm:text-sm">+25.0%</span>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Prediksi Minggu Depan</CardTitle>
+            <Card className="p-3 sm:p-4">
+              <CardHeader className="pb-3 px-0 pt-0">
+                <CardTitle className="text-base sm:text-lg">Prediksi Minggu Depan</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0 pb-0">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 7:</span>
-                    <span className="text-sm font-medium">78% ±5%</span>
+                    <span className="text-xs sm:text-sm">Kelas 7:</span>
+                    <span className="text-xs sm:text-sm font-medium">78% ±5%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 8:</span>
-                    <span className="text-sm font-medium">82% ±3%</span>
+                    <span className="text-xs sm:text-sm">Kelas 8:</span>
+                    <span className="text-xs sm:text-sm font-medium">82% ±3%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Kelas 9:</span>
-                    <span className="text-sm font-medium">76% ±4%</span>
+                    <span className="text-xs sm:text-sm">Kelas 9:</span>
+                    <span className="text-xs sm:text-sm font-medium">76% ±4%</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Efisiensi Sistem</CardTitle>
+            <Card className="p-3 sm:p-4">
+              <CardHeader className="pb-3 px-0 pt-0">
+                <CardTitle className="text-base sm:text-lg">Efisiensi Sistem</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-0 pb-0">
                 <div className="space-y-3">
                   <div>
-                    <div className="flex justify-between text-sm mb-1">
+                    <div className="flex justify-between text-xs sm:text-sm mb-1">
                       <span>Kapasitas Terpakai</span>
                       <span className="font-medium">77%</span>
                     </div>
-                    <Progress value={77} className="h-2" />
+                    <Progress value={77} className="h-1.5 sm:h-2" />
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Sistem berjalan optimal dengan 77% kapasitas terpakai
@@ -563,22 +588,22 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         {/* Tasks vs Exams */}
-        <TabsContent value="tasks-exams" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Komparasi Tugas vs Ujian</CardTitle>
-              <CardDescription>
+        <TabsContent value="tasks-exams" className="space-y-4 sm:space-y-6">
+          <Card className="p-4 sm:p-6">
+            <CardHeader className="pb-4 px-0 pt-0">
+              <CardTitle className="text-lg sm:text-xl">Komparasi Tugas vs Ujian</CardTitle>
+              <CardDescription className="text-sm">
                 Perbandingan jumlah tugas dan ujian per tingkatan
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
+            <CardContent className="px-0 pb-0">
+              <ResponsiveContainer width="100%" height={250} minHeight={200}>
                 <BarChart data={prepareTaskVsExamData()}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="grade" />
-                  <YAxis />
+                  <XAxis dataKey="grade" fontSize={12} />
+                  <YAxis fontSize={12} />
                   <Tooltip />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: '12px' }} />
                   <Bar dataKey="tasks" fill={COLORS.tasks} name="Total Tugas" />
                   <Bar dataKey="exams" fill={COLORS.exams} name="Total Ujian" />
                 </BarChart>
@@ -587,26 +612,26 @@ export default function AnalyticsPage() {
           </Card>
 
           {/* Task/Exam Ratio */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {prepareTaskVsExamData().map((grade) => (
-              <Card key={grade.grade}>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">{grade.grade}</CardTitle>
+              <Card key={grade.grade} className="p-3 sm:p-4">
+                <CardHeader className="pb-3 px-0 pt-0">
+                  <CardTitle className="text-base sm:text-lg">{grade.grade}</CardTitle>
                 </CardHeader>
-                  <CardContent>
+                  <CardContent className="px-0 pb-0">
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Tugas</span>
-                        <span className="text-lg font-bold text-blue-600">{grade.tasks}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">Tugas</span>
+                        <span className="text-base sm:text-lg font-bold text-blue-600">{grade.tasks}</span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Ujian</span>
-                        <span className="text-lg font-bold text-purple-600">{grade.exams}</span>
+                        <span className="text-xs sm:text-sm text-gray-600">Ujian</span>
+                        <span className="text-base sm:text-lg font-bold text-purple-600">{grade.exams}</span>
                       </div>
                       <div className="pt-2 border-t">
                         <div className="flex justify-between items-center">
                           <span className="text-xs text-gray-500">Total</span>
-                          <span className="text-sm font-bold">{grade.tasks + grade.exams}</span>
+                          <span className="text-xs sm:text-sm font-bold">{grade.tasks + grade.exams}</span>
                         </div>
                         <div className="mt-2">
                           <div className="flex justify-between text-xs mb-1">
@@ -615,7 +640,7 @@ export default function AnalyticsPage() {
                           </div>
                           <Progress
                             value={(grade.tasks / (grade.tasks + grade.exams)) * 100}
-                            className="h-1"
+                            className="h-1.5 sm:h-2"
                           />
                         </div>
                       </div>

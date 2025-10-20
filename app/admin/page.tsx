@@ -242,7 +242,7 @@ export default function AdminDashboard() {
                 <h3 className="text-xl font-outfit font-semibold text-blue-900 dark:text-blue-100">Legenda Warna Status Kelas</h3>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                   <div className="w-6 h-6 rounded-full bg-green-100 text-green-800 border-2 border-green-300 flex items-center justify-center text-xs font-bold">
                     ✓
@@ -274,8 +274,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-700">
-                <p className="text-sm font-inter font-medium text-blue-800 dark:text-blue-200 leading-relaxed">
+              <div className="mt-3 sm:mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-700">
+                <p className="text-xs sm:text-sm font-inter font-medium text-blue-800 dark:text-blue-200 leading-relaxed">
                   <span className="font-semibold">💡 Cara baca:</span> Setiap kelas maksimal 2 tugas + 2 ujian = 4 slot total.
                   <br/><span className="font-semibold">Contoh:</span> 2 tugas = 50% (kuning), 4 tugas = 100% (merah)
                 </p>
@@ -286,31 +286,31 @@ export default function AdminDashboard() {
 
         {/* Week Information */}
         <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
-                  <Calendar className="h-6 w-6 text-white" />
+          <CardContent className="pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-outfit font-semibold text-amber-900 dark:text-amber-100">Informasi Mingguan</h3>
-                  <p className="text-sm font-inter text-amber-700 dark:text-amber-300">
+                  <h3 className="text-base sm:text-lg font-outfit font-semibold text-amber-900 dark:text-amber-100">Informasi Mingguan</h3>
+                  <p className="text-xs sm:text-sm font-inter text-amber-700 dark:text-amber-300">
                     Sistem monitoring berdasarkan minggu akademik
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-3xl font-outfit font-bold text-amber-900 dark:text-amber-100">
+              <div className="text-right sm:text-left">
+                <div className="text-2xl sm:text-3xl font-outfit font-bold text-amber-900 dark:text-amber-100">
                   Minggu {getCurrentWeekNumber()}
                 </div>
-                <div className="text-sm font-inter text-amber-700 dark:text-amber-300">
+                <div className="text-xs sm:text-sm font-inter text-amber-700 dark:text-amber-300">
                   Tahun {new Date().getFullYear()}
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 p-4 bg-amber-100 dark:bg-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-amber-100 dark:bg-amber-900/30 rounded-xl border border-amber-200 dark:border-amber-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="flex items-start gap-3">
                   <div className="h-8 w-8 rounded-full bg-amber-200 dark:bg-amber-800 flex items-center justify-center flex-shrink-0 mt-1">
                     <Clock className="h-4 w-4 text-amber-700 dark:text-amber-300" />
@@ -367,7 +367,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
             {classStatus.map((gradeStatus) => {
               // Calculate statistics for this grade
               const classes = gradeStatus.classes || [];
@@ -400,13 +400,13 @@ export default function AdminDashboard() {
               const maxLoad = Math.round(highestLoadClass.loadPercentage);
 
               return (
-                <Card className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <Card key={gradeStatus.grade} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                   {/* Header Section */}
-                  <div className="p-6 pb-4">
-                    <div className="flex items-center justify-between mb-4">
+                  <div className="p-4 sm:p-6 pb-3 sm:pb-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3 sm:mb-4">
                       <div className="flex items-center gap-3">
                         {/* Status Icon */}
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md ${
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg shadow-md ${
                           overallStatus.color === 'green' ? 'bg-green-500' :
                           overallStatus.color === 'yellow' ? 'bg-yellow-500' :
                           overallStatus.color === 'orange' ? 'bg-orange-500' :
@@ -415,16 +415,16 @@ export default function AdminDashboard() {
                           {overallStatus.icon}
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                          <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                             Kelas {gradeStatus.grade}
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             {classes.length} kelas • Rata-rata beban: {Math.round(averageLoad)}%
                           </p>
                         </div>
                       </div>
                       {/* Badge */}
-                      <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
+                      <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full self-start sm:self-auto">
                         <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
                           {overloadedClasses} Penuh
                         </span>
@@ -432,67 +432,67 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Overall Status Bar */}
-                    <div className={`w-full rounded-lg p-3 mb-6 flex items-center gap-2 ${
+                    <div className={`w-full rounded-lg p-2 sm:p-3 mb-4 sm:mb-6 flex items-center gap-2 ${
                       overallStatus.color === 'green' ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300' :
                       overallStatus.color === 'yellow' ? 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300' :
                       overallStatus.color === 'orange' ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300' :
                       'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300'
                     }`}>
-                      <span className="text-lg font-bold">{overallStatus.icon}</span>
-                      <span className="text-sm font-medium">{overallStatus.text}</span>
+                      <span className="text-base sm:text-lg font-bold">{overallStatus.icon}</span>
+                      <span className="text-xs sm:text-sm font-medium">{overallStatus.text}</span>
                     </div>
                   </div>
 
                   {/* Key Metrics Section */}
-                  <div className="px-6 pb-6">
-                    <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                       {/* Average Load Metric */}
-                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-600 shadow-sm">
+                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600 shadow-sm">
                         <div className="flex items-center justify-between h-full">
                           <div className="flex-1">
                             <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
                               Rata-rata Beban
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-3xl font-bold text-gray-900 dark:text-white">
+                              <span className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
                                 {Math.round(averageLoad)}
                               </span>
-                              <span className="text-lg text-gray-500 dark:text-gray-400">%</span>
+                              <span className="text-sm sm:text-lg text-gray-500 dark:text-gray-400">%</span>
                             </div>
                           </div>
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ml-3">
-                            <BookOpen className="w-6 h-6 text-white" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg ml-2 sm:ml-3">
+                            <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
                         </div>
                       </div>
 
                       {/* Highest Load Metric */}
-                      <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-4 border border-orange-200 dark:border-orange-700 shadow-sm">
+                      <div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-3 sm:p-4 border border-orange-200 dark:border-orange-700 shadow-sm">
                         <div className="flex items-center justify-between h-full">
                           <div className="flex-1">
                             <p className="text-xs font-medium text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-1">
                               Beban Tertinggi
                             </p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                              <span className="text-2xl sm:text-3xl font-bold text-orange-600 dark:text-orange-400">
                                 {maxLoad}
                               </span>
-                              <span className="text-lg text-orange-500 dark:text-orange-500">%</span>
+                              <span className="text-sm sm:text-lg text-orange-500 dark:text-orange-500">%</span>
                             </div>
                             <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 font-medium">
                               {highestLoadClass.id}
                             </p>
                           </div>
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg ml-3">
-                            <AlertCircle className="w-6 h-6 text-white" />
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center shadow-lg ml-2 sm:ml-3">
+                            <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Status Per Kelas Section */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0">
                         <h4 className="text-sm font-bold text-gray-700 dark:text-gray-300">
                           Status Per Kelas
                         </h4>
@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                         </span>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-1.5 sm:space-y-2">
                         {classes.map((cls) => {
                           const totalSlots = cls.tasks + cls.exams;
                           const loadPercentage = ((cls.tasks + cls.exams) / 4) * 100;
@@ -519,10 +519,10 @@ export default function AdminDashboard() {
                           return (
                             <div
                               key={cls.id}
-                              className={`flex items-center justify-between p-3 rounded-lg border ${statusConfig.bgColor} ${statusConfig.borderColor} ${statusConfig.textColor} transition-all duration-200 hover:shadow-sm cursor-pointer`}
+                              className={`flex items-center justify-between p-2 sm:p-3 rounded-lg border ${statusConfig.bgColor} ${statusConfig.borderColor} ${statusConfig.textColor} transition-all duration-200 hover:shadow-sm cursor-pointer`}
                             >
-                              <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
+                              <div className="flex items-center gap-2 sm:gap-3">
+                                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm ${
                                   statusConfig.color === 'green' ? 'bg-green-500' :
                                   statusConfig.color === 'blue' ? 'bg-blue-500' :
                                   statusConfig.color === 'yellow' ? 'bg-yellow-500' :
@@ -532,12 +532,12 @@ export default function AdminDashboard() {
                                   {statusConfig.icon}
                                 </div>
                                 <div>
-                                  <div className="font-bold text-sm">{cls.id}</div>
-                                  <div className="text-xs opacity-75">{cls.name}</div>
+                                  <div className="font-bold text-xs sm:text-sm">{cls.id}</div>
+                                  <div className="text-xs opacity-75 hidden sm:block">{cls.name}</div>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="font-bold text-lg">{Math.round(loadPercentage)}%</div>
+                                <div className="font-bold text-sm sm:text-lg">{Math.round(loadPercentage)}%</div>
                                 <div className="text-xs opacity-75">
                                   {cls.tasks}T • {cls.exams}U
                                 </div>
