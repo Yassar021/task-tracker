@@ -1,28 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
-import { sql } from 'drizzle-orm';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const grade = searchParams.get('grade');
 
-    // Get classes from database to ensure consistency
-    const result = await db.execute(sql`
-      SELECT id, grade, name, is_active as "isActive"
-      FROM classes
-      WHERE is_active = true
-      ORDER BY grade, name
-    `);
+    const supabase = await createClient();
 
-    let classes = result.rows || [];
+    // Get classes from Supabase to ensure consistency
+    const { data: classes, error } = await supabase
+      .from('classes')
+      .select('id, grade, name, is_active')
+      .eq('is_active', true)
+      .order('grade')
+      .order('name', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching classes from Supabase:', error);
+      throw error;
+    }
+
+    let formattedClasses = classes || [];
 
     if (grade) {
       const gradeNum = parseInt(grade);
-      classes = classes.filter(cls => cls.grade === gradeNum);
+      formattedClasses = formattedClasses.filter(cls => cls.grade === gradeNum);
     }
 
-    return NextResponse.json({ classes });
+    // Transform is_active to isActive for frontend compatibility
+    const transformedClasses = formattedClasses.map(cls => ({
+      ...cls,
+      isActive: cls.is_active
+    }));
+
+    return NextResponse.json({ classes: transformedClasses });
   } catch (error) {
     console.error('Error fetching classes:', error);
 

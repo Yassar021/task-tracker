@@ -1,8 +1,10 @@
 "use client"
 
+import React from "react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "@/lib/auth-client"
+import { getCurrentUser, isAdmin, signOut as supabaseSignOut } from "@/lib/client-auth"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -34,6 +36,24 @@ export function SiteHeader() {
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+
+  // Check Supabase session and admin status
+  React.useEffect(() => {
+    const checkSupabaseAuth = async () => {
+      try {
+        const user = await getCurrentUser()
+        const adminStatus = await isAdmin()
+        setCurrentUser(user)
+        setIsSupabaseAdmin(adminStatus)
+      } catch (error) {
+        console.error('Error checking Supabase auth:', error)
+      }
+    }
+
+    checkSupabaseAuth()
+  }, [])
 
   const handleLogout = async () => {
     if (isLoggingOut) return // Prevent multiple clicks
@@ -43,8 +63,8 @@ export function SiteHeader() {
     try {
       console.log('Attempting logout...')
 
-      // Call signOut from auth client
-      await signOut()
+      // Try Supabase logout first
+      await supabaseSignOut()
 
       console.log('Logout successful, redirecting to homepage...')
       toast.success('Berhasil keluar dari sistem')
@@ -104,18 +124,15 @@ export function SiteHeader() {
   }
 
   const getNavigationItems = () => {
-    if (!session?.user?.id) {
+    // Check if user is logged in (either Better Auth or Supabase)
+    if (!session?.user?.id && !currentUser) {
       return [];
     }
 
-    // Check if user is admin using known admin IDs (same logic as admin-auth.ts)
-    const knownAdminIds = [
-      'WfyvCKXv6EW3XHuJ50Ids2oWAsOVup3Z', // admin@ypssingkole.sch.id
-    ];
+    // Check if user is admin (either from Better Auth or Supabase)
+    const isAdminUser = session?.user?.role === "admin" || isSupabaseAdmin;
 
-    const isAdmin = knownAdminIds.includes(session.user.id);
-
-    if (isAdmin) {
+    if (isAdminUser) {
       return [
         { href: "/admin", label: "Dashboard", icon: Home },
         { href: "/admin/assignments", label: "Tugas", icon: FileText },
@@ -187,18 +204,14 @@ export function SiteHeader() {
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex items-center justify-start gap-2 p-2">
                 <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-medium">{session?.user?.name || 'User'}</p>
+                  <p className="font-medium">
+                    {session?.user?.name || currentUser?.user_metadata?.name || session?.user?.email?.split('@')[0] || currentUser?.email?.split('@')[0] || 'Admin'}
+                  </p>
                   <p className="w-[200px] truncate text-sm text-muted-foreground">
-                    {session?.user?.email}
+                    {session?.user?.email || currentUser?.email || 'admin@ypssingkole.sch.id'}
                   </p>
                   <p className="text-xs text-muted-foreground capitalize">
-                    {(() => {
-                      if (!session?.user?.id) return '';
-                      const knownAdminIds = [
-                        'WfyvCKXv6EW3XHuJ50Ids2oWAsOVup3Z', // admin@ypssingkole.sch.id
-                      ];
-                      return knownAdminIds.includes(session.user.id) ? 'Admin' : (session.user.role || 'User');
-                    })()}
+                    {((session?.user?.role === "admin" || isSupabaseAdmin) ? 'Admin' : (session?.user?.role || 'User'))}
                   </p>
                 </div>
               </div>
@@ -226,7 +239,7 @@ export function SiteHeader() {
       </div>
 
       {/* Navigation Bar */}
-      {session?.user && (
+      {(session?.user || currentUser) && (
         <div className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="flex items-center justify-center gap-1 px-4 lg:px-6 h-14">
             <div className="flex items-center gap-1">

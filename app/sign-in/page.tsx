@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { signIn, useSession, getSession } from "@/lib/auth-client";
+import { signIn as supabaseSignIn, getCurrentUser } from "@/lib/client-auth";
 import { Loader2, AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
@@ -23,9 +24,24 @@ export default function SignInPage() {
 
     // Redirect if already logged in
     useEffect(() => {
-        if (!isPending && session?.user) {
-            router.replace("/admin");
-        }
+        const checkExistingSession = async () => {
+            if (!isPending && session?.user) {
+                router.replace("/admin");
+                return;
+            }
+
+            // Also check Supabase session if Better Auth session doesn't exist
+            try {
+                const user = await getCurrentUser();
+                if (user) {
+                    router.replace("/admin");
+                }
+            } catch (error) {
+                // No session, continue with login flow
+            }
+        };
+
+        checkExistingSession();
     }, [session, isPending, router]);
 
     // Auto-focus email input on mount
@@ -79,43 +95,29 @@ export default function SignInPage() {
                 description: "Memverifikasi kredensial Anda",
             });
 
-            const result = await signIn.email({
-                email,
-                password,
-            });
+            // Use Supabase auth
+            const result = await supabaseSignIn(email, password);
 
             // Dismiss loading toast
             toast.dismiss(loadingToast);
 
-            if (result.error) {
-                // Handle specific error messages
-                let errorMessage = "Sign in gagal";
-                let errorDescription = "Terjadi kesalahan saat masuk";
+            if (result.success) {
+                // Check if user is admin
+                const isAdmin = result.user?.isAdmin;
 
-                if (result.error.message?.toLowerCase().includes("invalid") ||
-                    result.error.message?.toLowerCase().includes("wrong")) {
-                    errorMessage = "Email atau password salah";
-                    errorDescription = "Periksa kembali email dan password Anda";
-                } else if (result.error.message?.toLowerCase().includes("not found")) {
-                    errorMessage = "Akun tidak ditemukan";
-                    errorDescription = "Email ini belum terdaftar dalam sistem";
-                } else if (result.error.message?.toLowerCase().includes("blocked")) {
-                    errorMessage = "Akun diblokir";
-                    errorDescription = "Hubungi administrator untuk bantuan";
-                } else if (result.error.message) {
-                    errorDescription = result.error.message;
+                if (!isAdmin) {
+                    toast.error("Akses ditolak", {
+                        description: "Anda tidak memiliki akses administrator",
+                        icon: <AlertCircle className="h-4 w-4" />,
+                        duration: 5000,
+                    });
+                    setError("Admin access required");
+                    return;
                 }
 
-                toast.error(errorMessage, {
-                    description: errorDescription,
-                    icon: <AlertCircle className="h-4 w-4" />,
-                    duration: 5000,
-                });
-                setError(result.error.message || "Sign in failed");
-            } else {
                 // Success toast
                 toast.success("Login berhasil!", {
-                    description: "Selamat datang kembali di sistem YPS",
+                    description: `Selamat datang kembali, ${result.user?.name || 'Admin'}`,
                     icon: <CheckCircle className="h-4 w-4" />,
                 });
 
@@ -123,14 +125,21 @@ export default function SignInPage() {
                 setTimeout(() => {
                     router.push("/admin");
                 }, 1000);
+            } else {
+                toast.error("Login gagal", {
+                    description: result.error || "Terjadi kesalahan saat masuk",
+                    icon: <AlertCircle className="h-4 w-4" />,
+                    duration: 5000,
+                });
+                setError(result.error || "Login failed");
             }
-        } catch (err) {
+        } catch (err: any) {
             toast.error("Terjadi kesalahan teknis", {
-                description: "Silakan coba lagi beberapa saat",
+                description: err.message || "Silakan coba lagi beberapa saat",
                 icon: <AlertCircle className="h-4 w-4" />,
                 duration: 5000,
             });
-            setError("An unexpected error occurred");
+            setError(err.message || "An unexpected error occurred");
         } finally {
             setIsLoading(false);
         }

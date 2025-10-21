@@ -1,39 +1,59 @@
 import { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { createClient } from '@/utils/supabase/server';
 
 export async function verifyAdmin(request: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: request.headers,
-  });
+  try {
+    const supabase = await createClient();
 
-  if (!session?.user?.id) {
+    // Get user from Supabase session
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error || !user) {
+      console.log('❌ No session found:', error?.message);
+      return {
+        error: 'Unauthorized - No session found',
+        status: 401
+      };
+    }
+
+    // Check against known admin emails
+    const knownAdminEmails = [
+      'admin@ypssingkole.sch.id',
+      'admin@yps.sch.id'
+    ];
+
+    const isAdmin = knownAdminEmails.includes(user.email || '');
+
+    console.log('Admin auth check:', {
+      userId: user.id,
+      userEmail: user.email,
+      knownAdminEmails,
+      isAdmin
+    });
+
+    if (!isAdmin) {
+      return {
+        error: 'Unauthorized - Admin access required',
+        status: 401
+      };
+    }
+
     return {
-      error: 'Unauthorized - No session found',
-      status: 401
+      session: {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          isAdmin
+        }
+      }
+    };
+
+  } catch (error) {
+    console.error('Admin auth verification error:', error);
+    return {
+      error: 'Authentication error',
+      status: 500
     };
   }
-
-  // Since session.role might be undefined, check against known admin IDs
-  // This is a temporary solution similar to the check-admin API
-  const knownAdminIds = [
-    'WfyvCKXv6EW3XHuJ50Ids2oWAsOVup3Z', // admin@ypssingkole.sch.id
-  ];
-
-  const isAdmin = knownAdminIds.includes(session.user.id);
-
-  console.log('Admin auth check:', {
-    userId: session.user.id,
-    userEmail: session.user.email,
-    knownAdminIds,
-    isAdmin
-  });
-
-  if (!isAdmin) {
-    return {
-      error: 'Unauthorized - Admin access required',
-      status: 401
-    };
-  }
-
-  return { session };
 }

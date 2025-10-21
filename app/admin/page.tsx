@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar, BookOpen, Plus } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
+import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import { Footer } from "@/components/layout/footer";
 import { toast } from "sonner";
 
@@ -102,6 +104,8 @@ const getTimeUntilNextReset = () => {
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
+  const [user, setUser] = useState<any>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [classStatus, setClassStatus] = useState<ClassStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeUntilReset, setTimeUntilReset] = useState<string>('');
@@ -120,44 +124,41 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    // If session is still loading, wait
-    if (session === undefined) {
-      return;
-    }
+    const checkAuthentication = async () => {
+      setIsCheckingAuth(true);
 
-    // If no session, redirect to sign-in
-    if (!session) {
-      window.location.href = "/sign-in";
-      return;
-    }
-
-    // Check if user is admin by looking up database directly
-    const checkAdminRole = async () => {
       try {
-        const response = await fetch('/api/auth/check-admin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId: session.user.id }),
-        });
-        const result = await response.json();
-
-        if (result.isAdmin) {
-          setAccessDenied(false);
-          // Fetch data only if admin
-          fetchDashboardData();
-        } else {
-          setAccessDenied(true);
+        // Check Supabase session first
+        const currentUser = await getCurrentUser();
+        if (!currentUser) {
+          window.location.href = "/sign-in";
+          return;
         }
+
+        // Check if user is admin
+        const adminCheck = await isAdmin();
+        if (!adminCheck) {
+          setAccessDenied(true);
+          setIsCheckingAuth(false);
+          return;
+        }
+
+        setUser(currentUser);
+        setAccessDenied(false);
+
+        // Fetch dashboard data
+        fetchDashboardData();
+
       } catch (error) {
-        console.error('Error checking admin role:', error);
-        setAccessDenied(true);
+        console.error('Authentication check failed:', error);
+        window.location.href = "/sign-in";
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
 
-    checkAdminRole();
-  }, [session]);
+    checkAuthentication();
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -191,13 +192,49 @@ export default function AdminDashboard() {
     );
   }
 
-  // Show loading while session is being fetched or dashboard data is loading
-  if (session === undefined || loading) {
+  // Show empty state if no data
+  if (classStatus.length === 0) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6">
+          <div className="space-y-3">
+            <h1 className="text-4xl font-outfit font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+              📊 Dashboard Status Kelas
+            </h1>
+            <p className="text-muted-foreground">
+              Monitoring beban kelas dan penugasan tugas
+            </p>
+          </div>
+
+          <Card className="p-8 text-center">
+            <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <h3 className="text-xl font-semibold mb-2">Belum Ada Data Kelas</h3>
+            <p className="text-muted-foreground mb-4">
+              Database kosong. Hubungi administrator untuk menambahkan data kelas.
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={() => window.location.href = '/setup-sample-data'}>
+                <Plus className="mr-2 h-4 w-4" />
+                Setup Sample Data
+              </Button>
+              <Button variant="outline" onClick={() => window.location.href = '/api/debug/check-data'}>
+                <BookOpen className="mr-2 h-4 w-4" />
+                Debug Data
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loading while checking authentication or loading dashboard data
+  if (isCheckingAuth || loading) {
     return (
       <div className="container mx-auto py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <div>Memuat data admin...</div>
+          <div>{isCheckingAuth ? 'Memeriksa autentikasi...' : 'Memuat data admin...'}</div>
         </div>
       </div>
     );

@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useSession } from "@/lib/auth-client"
+import { getCurrentUser, isAdmin, signOut } from "@/lib/client-auth"
 import {
   IconHome,
   IconDashboard,
@@ -33,10 +34,31 @@ import {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
+  const [isSupabaseAdmin, setIsSupabaseAdmin] = React.useState(false)
+  const [currentUser, setCurrentUser] = React.useState<any>(null)
+
+  // Check Supabase session and admin status
+  React.useEffect(() => {
+    const checkSupabaseAuth = async () => {
+      try {
+        const user = await getCurrentUser()
+        const adminStatus = await isAdmin()
+        setCurrentUser(user)
+        setIsSupabaseAdmin(adminStatus)
+      } catch (error) {
+        console.error('Error checking Supabase auth:', error)
+      }
+    }
+
+    checkSupabaseAuth()
+  }, [])
 
   // Define navigation based on user role
   const getNavItems = () => {
-    if (!session?.user?.role) {
+    // Check if user is admin (either from Better Auth or Supabase)
+    const isAdminUser = session?.user?.role === "admin" || isSupabaseAdmin
+
+    if (!session?.user?.role && !currentUser) {
       // Guest user - minimal navigation
       return [
         {
@@ -52,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ];
     }
 
-    if (session.user.role === "admin") {
+    if (isAdminUser) {
       // Admin navigation - management focus
       return [
         {
@@ -108,10 +130,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ];
   };
 
-  const userData = session?.user ? {
-    name: session.user.name || "User",
-    email: session.user.email,
-    avatar: session.user.image || "/codeguide-logo.png",
+  const userData = (session?.user || currentUser) ? {
+    name: session?.user?.name || currentUser?.user_metadata?.name || session?.user?.email?.split('@')[0] || currentUser?.email?.split('@')[0] || "Admin",
+    email: session?.user?.email || currentUser?.email || "admin@ypssingkole.sch.id",
+    avatar: session?.user?.image || "/codeguide-logo.png",
   } : {
     name: "Guest",
     email: "guest@example.com",
@@ -143,8 +165,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="px-3 py-2">
             <div className="mb-2">
               <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {!session?.user?.role ? 'Menu' :
-                 session.user.role === 'admin' ? 'Admin Panel' : 'Dashboard'}
+                {(!session?.user?.role && !currentUser) ? 'Menu' :
+                 (session?.user?.role === 'admin' || isSupabaseAdmin) ? 'Admin Panel' : 'Dashboard'}
               </p>
             </div>
             <SidebarMenu>
@@ -177,9 +199,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {session.user.role === 'admin' && (
+                {(session?.user?.role === 'admin' || isSupabaseAdmin) && (
                   <SidebarMenuItem>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton onClick={() => signOut().then(() => window.location.href = '/sign-in')}>
                       <IconLogout className="h-4 w-4" />
                       <span>Keluar</span>
                     </SidebarMenuButton>

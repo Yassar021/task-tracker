@@ -1,9 +1,7 @@
 import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db, users, teachers } from "@/db";
-import { account, session, user, verification } from "@/db/schema/auth";
 
-// Handle missing database gracefully
+// Temporary auth config without database adapter
+// We'll use Supabase directly for auth operations
 const authConfig: any = {
     emailAndPassword: {
         enabled: true,
@@ -30,19 +28,7 @@ const authConfig: any = {
     experimental: {
         enabled: true,
     },
+    // Skip database adapter for now - we'll use Supabase directly
 };
-
-// Only add database adapter if db is available
-if (db) {
-    authConfig.database = drizzleAdapter(db, {
-        provider: "pg", // PostgreSQL
-        schema: {
-            user: user,
-            account: account,
-            session: session,
-            verification: verification,
-        },
-    });
-}
 
 export const auth = betterAuth(authConfig);

@@ -72,7 +72,6 @@ export default function HomePage() {
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<string>('');
   const [inputCode, setInputCode] = useState('');
-  const [newAssignments, setNewAssignments] = useState<Assignment[]>([]);
   const [currentWeek, setCurrentWeek] = useState<{ weekNumber: number; year: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -112,11 +111,8 @@ export default function HomePage() {
       setAssignments(assignmentsData.assignments || []);
       setCurrentWeek(weekData.weekInfo);
 
-      // Combine existing assignments with new ones
-      const allAssignments = [...(assignmentsData.assignments || []), ...newAssignments];
-
       // Calculate status
-      const statuses = calculateClassStatuses(classesData.classes || [], allAssignments, weekData.weekInfo);
+      const statuses = calculateClassStatuses(classesData.classes || [], assignmentsData.assignments || [], weekData.weekInfo);
       setClassStatuses(statuses);
     } catch (error) {
       console.error("Error:", error);
@@ -567,58 +563,15 @@ export default function HomePage() {
           isOpen={showAssignmentForm}
           onClose={() => setShowAssignmentForm(false)}
           currentClassStatuses={classStatuses}
-          onSuccess={(newAssignment) => {
+          onSuccess={() => {
             setShowAssignmentForm(false);
-            if (newAssignment && currentWeek) {
-              console.log('Assignment created, updating UI...');
-
-              // Extract assigned class IDs from different possible structures
-              const assignedClassIds = newAssignment.classIds ||
-                (Array.isArray(newAssignment.assignedClasses)
-                  ? newAssignment.assignedClasses.map(ac => typeof ac === 'string' ? ac : ac.classId)
-                  : []);
-
-              console.log('Assignment created for classes:', assignedClassIds);
-              console.log('Assignment type:', newAssignment.type);
-
-              // Update progress bars without resetting
-              setClassStatuses(currentStatuses => {
-                const newStatuses = currentStatuses.map(status => {
-                  if (assignedClassIds.includes(status.class.id)) {
-                    const increment = newAssignment.type === 'TUGAS' ? 1 : 0;
-                    const examIncrement = newAssignment.type === 'UJIAN' ? 1 : 0;
-
-                    const newTasks = Math.min(status.tasks + increment, status.maxTasks);
-                    const newExams = Math.min(status.exams + examIncrement, status.maxExams);
-
-                    console.log(`Updating ${status.class.id}: tasks ${status.tasks}→${newTasks}, exams ${status.exams}→${newExams}`);
-
-                    // Preserve existing data, just update the counters
-                    return {
-                      ...status,
-                      tasks: newTasks,
-                      exams: newExams,
-                      updateCounter: (status.updateCounter || 0) + 1, // Increment instead of timestamp
-                    };
-                  }
-                  return status;
-                });
-
-                console.log('New statuses:', newStatuses.map(s => ({id: s.class.id, tasks: s.tasks, exams: s.exams})));
-                return newStatuses;
-              });
-            }
-            // For database mode, refresh data from server to get accurate state
-            // Use longer delay to ensure database write is complete
-            if (!newAssignment.isOfflineMode) {
-              console.log('Refreshing data from server after database save...');
-              setTimeout(() => {
-                console.log('Executing fetchHomeData refresh...');
-                fetchHomeData();
-              }, 1000); // Increased delay for database consistency
-            }
+            toast.success("Tugas/Ujian berhasil ditambahkan!");
+            // Refresh data from server to get updated state
+            setTimeout(() => {
+              fetchHomeData();
+            }, 500);
           }}
-          teacherId="temp-teacher-id" // TODO: Get actual teacher ID from session
+          teacherId="T_BrdZG4ZO" // Using existing teacher ID from Supabase
         />
       )}
 

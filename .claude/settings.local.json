@@ -18,7 +18,11 @@
       "Bash(npx tsc:*)",
       "Bash(cat:*)",
       "Bash(node:*)",
-      "Bash(bash:*)"
+      "Bash(bash:*)",
+      "Bash(ping:*)",
+      "Bash(nslookup:*)",
+      "WebFetch(domain:supabase.com)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

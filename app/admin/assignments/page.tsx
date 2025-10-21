@@ -13,7 +13,8 @@ import {
   CheckCircle,
   Clock,
   Users,
-  BookOpen
+  BookOpen,
+  Plus
 } from "lucide-react";
 import { toast } from "sonner";
 import { useSession } from "@/lib/auth-client";
@@ -85,7 +86,13 @@ export default function AssignmentsPage() {
         setAssignments(data.assignments || []);
         setTotalPages(data.pagination?.totalPages || 1);
       } else {
-        toast.error(data.error || "Gagal memuat data tugas");
+        // Handle case where there's no data but API worked
+        if (data.assignments && Array.isArray(data.assignments)) {
+          setAssignments(data.assignments);
+          setTotalPages(1);
+        } else {
+          toast.error(data.error || "Gagal memuat data tugas");
+        }
       }
     } catch (error) {
       console.error("Error fetching assignments:", error);
@@ -177,6 +184,33 @@ export default function AssignmentsPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Memuat data tugas...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no assignments
+  if (!loading && assignments.length === 0) {
+    return (
+      <div className="container mx-auto py-8">
+        <div className="text-center space-y-6">
+          <div>
+            <FileText className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <h3 className="text-xl font-semibold">Belum Ada Tugas</h3>
+            <p className="text-muted-foreground">
+              Belum ada data tugas dalam database. Hubungi administrator untuk menambahkan data.
+            </p>
+          </div>
+          <div className="flex gap-2 justify-center">
+            <Button onClick={() => window.location.href = '/setup-sample-data'}>
+              <Plus className="mr-2 h-4 w-4" />
+              Setup Sample Data
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/api/debug/check-data'}>
+              <BookOpen className="mr-2 h-4 w-4" />
+              Debug Data
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -327,7 +361,7 @@ export default function AssignmentsPage() {
                 <tbody>
                   {assignments.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="h-24 text-center">
+                      <td colSpan={8} className="h-24 text-center">
                         <div className="flex flex-col items-center justify-center text-muted-foreground">
                           <FileText className="h-12 w-12 mb-4 opacity-50" />
                           <p>Belum ada tugas untuk filter yang dipilih</p>
@@ -358,12 +392,16 @@ export default function AssignmentsPage() {
                           {getStatusBadge(assignment.status)}
                         </td>
                         <td className="p-4">
-                          {assignment.class_assignments?.map((ca, index) => (
-                            <Badge key={index} variant="secondary" className="mr-1">
-                              {ca.class_id}
-                            </Badge>
-                          )) || (
-                            <span className="text-muted-foreground">-</span>
+                          {assignment.class_assignments && assignment.class_assignments.length > 0 ? (
+                            <div className="flex flex-wrap gap-1">
+                              {assignment.class_assignments.map((ca, index) => (
+                                <Badge key={index} variant="secondary">
+                                  {ca.classes?.name || ca.class_id}
+                                </Badge>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground italic">Tidak ada kelas</span>
                           )}
                         </td>
                         <td className="p-4 text-sm text-muted-foreground">
