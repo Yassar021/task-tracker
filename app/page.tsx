@@ -275,62 +275,21 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
-        <div className="text-center space-y-4 sm:space-y-6 max-w-sm sm:max-w-md mx-auto">
-          {/* Animated Logo */}
-          <div className="relative">
-            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto relative">
-              {/* Outer ring */}
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 animate-pulse"></div>
-              <div className="absolute inset-2 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 animate-spin"></div>
-              <div className="absolute inset-4 rounded-full bg-white flex items-center justify-center">
-                <BookOpen className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 animate-bounce" />
-              </div>
-            </div>
-
-            {/* Orbiting dots */}
-            <div className="absolute inset-0 animate-spin">
-              <div className="absolute top-0 left-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full transform -translate-x-1/2"></div>
-              <div className="absolute bottom-0 left-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-indigo-500 rounded-full transform -translate-x-1/2"></div>
-              <div className="absolute left-0 top-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-500 rounded-full transform -translate-y-1/2"></div>
-              <div className="absolute right-0 top-1/2 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-400 rounded-full transform -translate-y-1/2"></div>
-            </div>
+        <div className="text-center space-y-4 max-w-xs mx-auto">
+          {/* Simple Spinner */}
+          <div className="flex justify-center">
+            <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
           </div>
 
-          {/* Loading text with animation */}
-          <div className="space-y-2 sm:space-y-3">
-            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent animate-pulse">
+          {/* Simple Loading Text */}
+          <div className="space-y-2">
+            <h2 className="text-lg font-medium text-gray-700">
               Memuat Data...
             </h2>
-            <p className="text-sm sm:text-base text-gray-600 animate-pulse">
+            <p className="text-sm text-gray-500">
               Mengambil informasi kelas dan tugas
             </p>
           </div>
-
-          {/* Progress bar */}
-          <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full animate-pulse"
-                 style={{ width: '70%' }}></div>
-          </div>
-
-          {/* Loading dots animation */}
-          <div className="flex justify-center space-x-1.5 sm:space-x-2">
-            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-          </div>
-
-          {/* Floating elements */}
-          <div className="relative h-16 sm:h-20">
-            <div className="absolute top-0 left-1/4 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '0ms' }}>📚</div>
-            <div className="absolute top-0 right-1/4 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '200ms' }}>📝</div>
-            <div className="absolute bottom-0 left-1/3 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '400ms' }}>✏️</div>
-            <div className="absolute bottom-0 right-1/3 text-xl sm:text-2xl animate-bounce" style={{ animationDelay: '600ms' }}>🎯</div>
-          </div>
-
-          {/* Subtle hint */}
-          <p className="text-xs text-gray-500 animate-pulse">
-            Mohon tunggu sebentar...
-          </p>
         </div>
       </div>
     );
