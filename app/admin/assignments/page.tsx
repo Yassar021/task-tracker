@@ -4,6 +4,17 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   FileText,
   Eye,
@@ -25,7 +36,7 @@ interface Assignment {
   title: string;
   subject: string;
   type: "TUGAS" | "UJIAN";
-  status: "draft" | "published" | "graded" | "closed";
+  status: "published" | "not_evaluated" | "evaluated";
   week_number: number;
   year: number;
   created_at: string;
@@ -55,6 +66,11 @@ export default function AssignmentsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+  const [newStatus, setNewStatus] = useState<string>('');
+  const [assignmentStatusOverrides, setAssignmentStatusOverrides] = useState<Record<string, string>>({});
 
   // Get current week info
   const getCurrentWeekInfo = () => {
@@ -70,6 +86,23 @@ export default function AssignmentsPage() {
 
   const itemsPerPage = 10;
 
+  // Function to auto-update status based on week change
+  const updateStatusBasedOnWeek = (assignments: Assignment[]): Assignment[] => {
+    return assignments.map(assignment => {
+      const assignmentWeek = assignment.week_number;
+      const currentWeekInfo = getCurrentWeekInfo();
+
+      // Only auto-update if assignment is from previous week and still published
+      // Don't override admin's manual changes (evaluated status)
+      if (assignmentWeek < currentWeekInfo.weekNumber && assignment.status === 'published') {
+        console.log(`Auto-updating assignment ${assignment.id} from published to not_evaluated (week ${assignmentWeek} < ${currentWeekInfo.weekNumber})`);
+        return { ...assignment, status: 'not_evaluated' };
+      }
+
+      return assignment;
+    });
+  };
+
   // Fetch assignments from API
   const fetchAssignments = async () => {
     setLoading(true);
@@ -83,12 +116,30 @@ export default function AssignmentsPage() {
       const data = await response.json();
 
       if (data.success) {
-        setAssignments(data.assignments || []);
+        // Apply auto-update status logic
+        let updatedAssignments = updateStatusBasedOnWeek(data.assignments || []);
+
+        // Apply manual status overrides
+        updatedAssignments = updatedAssignments.map(assignment => ({
+          ...assignment,
+          status: assignmentStatusOverrides[assignment.id] || assignment.status
+        }));
+
+        setAssignments(updatedAssignments);
         setTotalPages(data.pagination?.totalPages || 1);
       } else {
         // Handle case where there's no data but API worked
         if (data.assignments && Array.isArray(data.assignments)) {
-          setAssignments(data.assignments);
+          // Apply auto-update status logic for fallback data too
+          let updatedAssignments = updateStatusBasedOnWeek(data.assignments);
+
+          // Apply manual status overrides for fallback data
+          updatedAssignments = updatedAssignments.map(assignment => ({
+            ...assignment,
+            status: assignmentStatusOverrides[assignment.id] || assignment.status
+          }));
+
+          setAssignments(updatedAssignments);
           setTotalPages(1);
         } else {
           toast.error(data.error || "Gagal memuat data tugas");
@@ -110,12 +161,10 @@ export default function AssignmentsPage() {
     switch (status) {
       case "published":
         return <Badge className="bg-green-100 text-green-800">Published</Badge>;
-      case "draft":
-        return <Badge className="bg-yellow-100 text-yellow-800">Draft</Badge>;
-      case "graded":
-        return <Badge className="bg-blue-100 text-blue-800">Graded</Badge>;
-      case "closed":
-        return <Badge className="bg-gray-100 text-gray-800">Closed</Badge>;
+      case "not_evaluated":
+        return <Badge className="bg-orange-100 text-orange-800">Not Evaluated</Badge>;
+      case "evaluated":
+        return <Badge className="bg-blue-100 text-blue-800">Evaluated</Badge>;
       default:
         return <Badge className="bg-gray-100 text-gray-800">{status}</Badge>;
     }
@@ -132,11 +181,16 @@ export default function AssignmentsPage() {
     }
   };
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = () => {
     if (selectedAssignments.length === 0) {
       toast.error("Pilih tugas yang akan dihapus");
       return;
     }
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    setShowDeleteModal(false);
 
     try {
       const response = await fetch('/api/admin/assignments', {
@@ -160,6 +214,61 @@ export default function AssignmentsPage() {
       console.error("Error deleting assignments:", error);
       toast.error("Terjadi kesalahan saat menghapus tugas");
     }
+  };
+
+  const updateAssignmentStatus = async () => {
+    if (!selectedAssignment) return;
+
+    console.log(`Updating assignment ${selectedAssignment.id} from ${selectedAssignment.status} to ${newStatus}`);
+
+    try {
+      const response = await fetch(`/api/admin/assignments/${selectedAssignment.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      if (data.success) {
+        toast.success("Status tugas berhasil diubah");
+
+        // Store the status override for mock data persistence
+        setAssignmentStatusOverrides(prev => ({
+          ...prev,
+          [selectedAssignment.id]: newStatus
+        }));
+
+        setShowEditModal(false);
+        setSelectedAssignment(null);
+        setNewStatus('');
+
+        // Delay slightly to ensure server update is processed
+        setTimeout(() => {
+          fetchAssignments();
+        }, 100);
+      } else {
+        toast.error(data.error || "Gagal mengubah status tugas");
+      }
+    } catch (error) {
+      console.error("Error updating assignment status:", error);
+      toast.error("Terjadi kesalahan saat mengubah status");
+    }
+  };
+
+  const handleEditStatus = (assignment: Assignment) => {
+    setSelectedAssignment(assignment);
+    setNewStatus(assignment.status);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setSelectedAssignment(null);
+    setNewStatus('');
   };
 
   const toggleSelection = (assignmentId: string) => {
@@ -236,7 +345,9 @@ export default function AssignmentsPage() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{assignments.length}</div>
+            <div className="text-2xl font-bold">
+              {assignments.filter(a => a.week_number === currentWeek.weekNumber).length}
+            </div>
             <p className="text-xs text-muted-foreground">
               Minggu {currentWeek.weekNumber}
             </p>
@@ -245,40 +356,40 @@ export default function AssignmentsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tugas Aktif</CardTitle>
+            <CardTitle className="text-sm font-medium">Published</CardTitle>
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {assignments.filter(a => a.status === 'published').length}
+              {assignments.filter(a => a.status === 'published' && a.week_number === currentWeek.weekNumber).length}
             </div>
-            <p className="text-xs text-muted-foreground">Published</p>
+            <p className="text-xs text-muted-foreground">Tugas aktif minggu ini</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Draft</CardTitle>
-            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <CardTitle className="text-sm font-medium">Not Evaluated</CardTitle>
+            <AlertCircle className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {assignments.filter(a => a.status === 'draft').length}
+            <div className="text-2xl font-bold text-orange-600">
+              {assignments.filter(a => a.status === 'not_evaluated').length}
             </div>
-            <p className="text-xs text-muted-foreground">Belum dipublish</p>
+            <p className="text-xs text-muted-foreground">Total belum dinilai</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ujian</CardTitle>
+            <CardTitle className="text-sm font-medium">Evaluated</CardTitle>
             <Clock className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {assignments.filter(a => a.type === 'UJIAN').length}
+              {assignments.filter(a => a.status === 'evaluated').length}
             </div>
-            <p className="text-xs text-muted-foreground">Total ujian</p>
+            <p className="text-xs text-muted-foreground">Total sudah dinilai</p>
           </CardContent>
         </Card>
       </div>
@@ -396,7 +507,13 @@ export default function AssignmentsPage() {
                             <div className="flex flex-wrap gap-1">
                               {assignment.class_assignments.map((ca, index) => (
                                 <Badge key={index} variant="secondary">
-                                  {ca.classes?.name || ca.class_id}
+                                  {ca.classes ? (
+                                    <>
+                                      {ca.classes.grade} - {ca.classes.name}
+                                    </>
+                                  ) : (
+                                    ca.class_id
+                                  )}
                                 </Badge>
                               ))}
                             </div>
@@ -418,7 +535,12 @@ export default function AssignmentsPage() {
                             <Button variant="ghost" size="sm">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="sm">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditStatus(assignment)}
+                              title="Edit Status"
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                             <Button
@@ -464,6 +586,96 @@ export default function AssignmentsPage() {
           </Button>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Yakin Menghapus Tugas?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedAssignments.length === 1 ? (
+                <>Apakah Anda yakin ingin menghapus 1 tugas? Tindakan ini tidak dapat dibatalkan.</>
+              ) : (
+                <>Apakah Anda yakin ingin menghapus {selectedAssignments.length} tugas? Tindakan ini tidak dapat dibatalkan.</>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Ya, Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Status Modal */}
+      <AlertDialog open={showEditModal} onOpenChange={handleCloseEditModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Edit Status Tugas</AlertDialogTitle>
+          </AlertDialogHeader>
+          {selectedAssignment && (
+            <div className="space-y-2 mb-4">
+              <div><strong>Judul:</strong> {selectedAssignment.title}</div>
+              <div><strong>Mata Pelajaran:</strong> {selectedAssignment.subject}</div>
+              <div><strong>Kelas:</strong>
+                {selectedAssignment.class_assignments && selectedAssignment.class_assignments.length > 0 ? (
+                  selectedAssignment.class_assignments.map((ca, index) => (
+                    <span key={index} className="ml-1">
+                      {ca.classes ? (
+                        <>Kelas {ca.classes.grade} - {ca.classes.name}</>
+                      ) : (
+                        ca.class_id
+                      )}
+                      {index < selectedAssignment.class_assignments.length - 1 && ', '}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-muted-foreground italic ml-1">Tidak ada kelas</span>
+                )}
+              </div>
+            </div>
+          )}
+          <div className="py-4">
+            <label className="text-sm font-medium mb-2 block">Status Baru:</label>
+            <Select value={newStatus} onValueChange={setNewStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Pilih status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="published">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-100 border border-green-300 rounded-full"></div>
+                    Published - Tugas aktif minggu ini
+                  </div>
+                </SelectItem>
+                <SelectItem value="not_evaluated">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-orange-100 border border-orange-300 rounded-full"></div>
+                    Not Evaluated - Belum dinilai
+                  </div>
+                </SelectItem>
+                <SelectItem value="evaluated">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded-full"></div>
+                    Evaluated - Sudah dinilai
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={updateAssignmentStatus}>
+              Simpan Perubahan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Footer */}
       <Footer />

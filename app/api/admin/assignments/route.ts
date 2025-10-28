@@ -74,9 +74,18 @@ export async function GET(request: NextRequest) {
 
     console.log(`✅ Found ${assignments?.length || 0} assignments, total count: ${count}`);
 
+    // Map database status to frontend status
+    const statusMapping: Record<string, string> = {
+      'published': 'published',
+      'draft': 'not_evaluated', // Draft becomes not_evaluated
+      'graded': 'evaluated', // Graded becomes evaluated
+      'closed': 'evaluated' // Closed becomes evaluated too
+    };
+
     // Format the data to ensure consistent structure
     const formattedAssignments = assignments?.map(assignment => ({
       ...assignment,
+      status: statusMapping[assignment.status] || assignment.status,
       class_assignments: assignment.class_assignments?.map(ca => ({
         class_id: ca.class_id,
         classes: ca.classes || null
@@ -99,6 +108,14 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error in assignments API:', error);
 
+    // Get current week for mock data
+    const now = new Date();
+    const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    const currentWeek = { weekNumber: weekNo, year: d.getUTCFullYear() };
+
     // Return mock data as fallback
     console.log('⚠️ Using mock data as fallback');
     const mockAssignments = [
@@ -108,10 +125,10 @@ export async function GET(request: NextRequest) {
         subject: 'Matematika',
         type: 'TUGAS',
         status: 'published',
-        week_number: 42,
+        week_number: currentWeek.weekNumber,
         year: 2025,
-        created_at: new Date('2025-10-15').toISOString(),
-        due_date: '2025-10-22T23:59:59Z',
+        created_at: new Date('2025-10-28').toISOString(),
+        due_date: '2025-11-04T23:59:59Z',
         description: 'Pengerjaan soal-soal latihan persamaan kuadrat',
         teacher: {
           id: 'teacher-mock-1',
@@ -128,11 +145,11 @@ export async function GET(request: NextRequest) {
         title: 'Ulangan Harian IPA',
         subject: 'IPA',
         type: 'UJIAN',
-        status: 'draft',
-        week_number: 42,
+        status: 'not_evaluated',
+        week_number: currentWeek.weekNumber - 1,
         year: 2025,
-        created_at: new Date('2025-10-18').toISOString(),
-        due_date: '2025-10-25T23:59:59Z',
+        created_at: new Date('2025-10-15').toISOString(),
+        due_date: '2025-10-22T23:59:59Z',
         description: 'Ulangan harian materi sistem ekskresi',
         teacher: {
           id: 'teacher-mock-2',
@@ -142,6 +159,26 @@ export async function GET(request: NextRequest) {
         class_assignments: [
           { class_id: '8-COL', classes: { id: '8-COL', grade: 8, name: 'Collaborative' } },
           { class_id: '8-IND', classes: { id: '8-IND', grade: 8, name: 'Individual' } }
+        ]
+      },
+      {
+        id: 'mock-3',
+        title: 'Tugas Praktikum Kimia',
+        subject: 'Kimia',
+        type: 'TUGAS',
+        status: 'evaluated',
+        week_number: currentWeek.weekNumber - 2,
+        year: 2025,
+        created_at: new Date('2025-10-08').toISOString(),
+        due_date: '2025-10-15T23:59:59Z',
+        description: 'Laporan hasil praktikum pengenalan alat laboratorium',
+        teacher: {
+          id: 'teacher-mock-3',
+          name: 'Ahmad Fadli',
+          email: 'ahmad@ypssingkole.sch.id'
+        },
+        class_assignments: [
+          { class_id: '9-COL', classes: { id: '9-COL', grade: 9, name: 'Collaborative' } }
         ]
       }
     ];
