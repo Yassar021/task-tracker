@@ -207,7 +207,7 @@ export default function HomePage() {
         tasks,
         exams,
         maxTasks: 2,
-        maxExams: 2
+        maxExams: 5
       };
 
       // Log only classes with assignments

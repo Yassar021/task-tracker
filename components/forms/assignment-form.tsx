@@ -119,7 +119,10 @@ export function AssignmentForm({
   const [selectedClasses, setSelectedClasses] = useState<string[]>(assignment ? [] : []);
   const [classes, setClasses] = useState<Class[]>([]);
   const [classQuotas, setClassQuotas] = useState<Record<string, { used: number; max: number }>>({});
-  const [maxQuota] = useState(2); // Default max 2 assignments per week per class
+  // Get max quota based on assignment type
+  const getMaxQuota = (type: 'TUGAS' | 'UJIAN') => {
+    return type === 'TUGAS' ? 2 : 5; // 2 tasks, 5 exams per week
+  };
   const [isCheckingQuota, setIsCheckingQuota] = useState(false);
   const [currentWeekInfo] = useState(getCurrentWeekInfo());
 
@@ -179,7 +182,10 @@ export function AssignmentForm({
   // Force re-render when assignment type changes (affects class availability)
   const assignmentType = watch('type');
   useEffect(() => {
-    // Re-render to update class availability based on assignment type
+    // Re-check quotas when assignment type changes
+    if (selectedClasses.length > 0) {
+      checkClassQuotas();
+    }
   }, [assignmentType]);
 
   const checkClassQuotas = async () => {
@@ -248,7 +254,8 @@ export function AssignmentForm({
 
   const canSelectClass = (classId: string) => {
     const currentCount = classQuotas[classId]?.used || 0;
-    return currentCount < maxQuota;
+    const maxLimit = getMaxQuota(selectedType);
+    return currentCount < maxLimit;
   };
 
   const getClassQuotaStatus = (classId: string) => {
@@ -257,9 +264,10 @@ export function AssignmentForm({
     const assignmentType = watch('type');
 
     if (!classStatus) {
+      const maxLimit = getMaxQuota(assignmentType);
       return {
         current: 0,
-        remaining: 2,
+        remaining: maxLimit,
         canSelect: true,
         status: "available" as const,
       };
@@ -389,7 +397,7 @@ export function AssignmentForm({
           </DialogTitle>
           <DialogDescription>
             Minggu {currentWeekInfo.weekNumber} Tahun {currentWeekInfo.year} -
-            Batas maksimal: {maxQuota} tugas/ujian per kelas per minggu
+            Batas: 2 TUGAS & 5 UJIAN per kelas per minggu (Total 7)
           </DialogDescription>
         </DialogHeader>
 

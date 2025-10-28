@@ -13,7 +13,7 @@ async function initializeSettings() {
       },
       {
         key: 'max_weekly_exams',
-        value: '2',
+        value: '5',
         description: 'Maximum number of exams per class per week',
       },
       {

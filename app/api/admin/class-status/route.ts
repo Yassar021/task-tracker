@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
         tasks: 0,
         exams: 0,
         maxTasks: 2,
-        maxExams: 2,
+        maxExams: 5,
         loadPercentage: 0,
         isOverloaded: false
       });

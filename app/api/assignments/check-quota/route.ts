@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
     console.log('Checking quota:', { classIds, weekNumber, year, assignmentType });
 
     const supabase = await createClient();
-    const maxLimit = 2;
+
+    // Set limit based on assignment type
+    const maxLimit = assignmentType === 'TUGAS' ? 2 : 5; // 2 tasks, 5 exams per week
     const quotas: Record<string, { used: number; max: number }> = {};
 
     for (const classId of classIds) {

@@ -314,8 +314,8 @@ export default function AdminDashboard() {
 
               <div className="mt-3 sm:mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl border border-blue-200 dark:border-blue-700">
                 <p className="text-xs sm:text-sm font-inter font-medium text-blue-800 dark:text-blue-200 leading-relaxed">
-                  <span className="font-semibold">💡 Cara baca:</span> Setiap kelas maksimal 2 tugas + 2 ujian = 4 slot total.
-                  <br/><span className="font-semibold">Contoh:</span> 2 tugas = 50% (kuning), 4 tugas = 100% (merah)
+                  <span className="font-semibold">💡 Cara baca:</span> Setiap kelas maksimal 2 tugas + 5 ujian = 7 slot total.
+                  <br/><span className="font-semibold">Contoh:</span> 3 tugas = ~43% (kuning), 7 tugas = 100% (merah)
                 </p>
               </div>
             </CardContent>
@@ -411,15 +411,15 @@ export default function AdminDashboard() {
               const classes = gradeStatus.classes || [];
               const totalTasks = classes.reduce((sum, cls) => sum + cls.tasks, 0);
               const totalExams = classes.reduce((sum, cls) => sum + cls.exams, 0);
-              const averageLoad = classes.length > 0 ? ((totalTasks + totalExams) / (classes.length * 4)) * 100 : 0;
+              const averageLoad = classes.length > 0 ? ((totalTasks + totalExams) / (classes.length * 7)) * 100 : 0;
               const averageTasks = classes.length > 0 ? totalTasks / classes.length : 0;
               const averageExams = classes.length > 0 ? totalExams / classes.length : 0;
-              const overloadedClasses = classes.filter(cls => ((cls.tasks + cls.exams) / 4) * 100 >= 100).length;
+              const overloadedClasses = classes.filter(cls => ((cls.tasks + cls.exams) / 7) * 100 >= 100).length;
 
               // Find highest load class
               const classLoads = classes.map(cls => ({
                 ...cls,
-                loadPercentage: ((cls.tasks + cls.exams) / 4) * 100
+                loadPercentage: ((cls.tasks + cls.exams) / 7) * 100
               }));
               const highestLoadClass = classLoads.reduce((max, cls) =>
                 cls.loadPercentage > max.loadPercentage ? cls : max,
@@ -535,20 +535,20 @@ export default function AdminDashboard() {
                           Status Per Kelas
                         </h4>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          (Maks 2 Tugas + 2 Ujian)
+                          (Maks 2 Tugas + 5 Ujian)
                         </span>
                       </div>
 
                       <div className="space-y-1.5 sm:space-y-2">
                         {classes.map((cls) => {
                           const totalSlots = cls.tasks + cls.exams;
-                          const loadPercentage = ((cls.tasks + cls.exams) / 4) * 100;
+                          const loadPercentage = ((cls.tasks + cls.exams) / 7) * 100;
 
                           const getStatusConfig = () => {
                             if (totalSlots === 0) return { color: 'green', icon: '✓', textColor: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-50 dark:bg-green-900/20', borderColor: 'border-green-200 dark:border-green-800' };
-                            if (totalSlots === 1) return { color: 'blue', icon: '✓', textColor: 'text-blue-700 dark:text-blue-300', bgColor: 'bg-blue-50 dark:bg-blue-900/20', borderColor: 'border-blue-200 dark:border-blue-800' };
-                            if (totalSlots === 2) return { color: 'yellow', icon: '!', textColor: 'text-yellow-700 dark:text-yellow-300', bgColor: 'bg-yellow-50 dark:bg-yellow-900/20', borderColor: 'border-yellow-200 dark:border-yellow-800' };
-                            if (totalSlots === 3) return { color: 'orange', icon: '!', textColor: 'text-orange-700 dark:text-orange-300', bgColor: 'bg-orange-50 dark:bg-orange-900/20', borderColor: 'border-orange-200 dark:border-orange-800' };
+                            if (totalSlots <= 2) return { color: 'blue', icon: '✓', textColor: 'text-blue-700 dark:text-blue-300', bgColor: 'bg-blue-50 dark:bg-blue-900/20', borderColor: 'border-blue-200 dark:border-blue-800' };
+                            if (totalSlots <= 4) return { color: 'yellow', icon: '!', textColor: 'text-yellow-700 dark:text-yellow-300', bgColor: 'bg-yellow-50 dark:bg-yellow-900/20', borderColor: 'border-yellow-200 dark:border-yellow-800' };
+                            if (totalSlots <= 6) return { color: 'orange', icon: '!', textColor: 'text-orange-700 dark:text-orange-300', bgColor: 'bg-orange-50 dark:bg-orange-900/20', borderColor: 'border-orange-200 dark:border-orange-800' };
                             return { color: 'red', icon: '!', textColor: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-50 dark:bg-red-900/20', borderColor: 'border-red-200 dark:border-red-800' };
                           };
 
