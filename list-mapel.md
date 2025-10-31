@@ -1,0 +1,16 @@
+### **List Mata Pelajaran : **
+- 🟡 **AGAMA ISLAM**
+- 🟡 **AGAMA KRISTEN**
+- 🟡 **AGAMA KATOLIK**
+- 🟡 **AGAMA HINDU**
+- 🟡 **PENDIDIKAN AGAMA**
+- 🟡 **PANCASILA**
+- 🟡 **BAHASA INDONESIA**
+- 🟡 **MATEMATIKA**
+- 🟡 **IPA**
+- 🟡 **IPS**
+- 🟡 **BAHASA INGGRIS**
+- 🟡 **PJOK**
+- 🟡 **INFORMATIKA**
+- 🟡 **SENI, BUDAYA DAN PRAKARYA**
+- 🟡 **MANDARIN**

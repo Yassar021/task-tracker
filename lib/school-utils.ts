@@ -133,25 +133,23 @@ export function formatPhoneNumber(phone: string): string {
   return cleanPhone;
 }
 
-// Subject list for SMP (can be expanded)
+// Subject list for SMP (sesuai list-mapel.md)
 export const SMP_SUBJECTS = [
-  "Matematika",
-  "Bahasa Indonesia",
-  "Bahasa Inggris",
+  "AGAMA ISLAM",
+  "AGAMA KRISTEN",
+  "AGAMA KATOLIK",
+  "AGAMA HINDU",
+  "PENDIDIKAN AGAMA",
+  "PANCASILA",
+  "BAHASA INDONESIA",
+  "MATEMATIKA",
   "IPA",
   "IPS",
-  "PKN",
-  "Seni Budaya",
-  "Penjaskes",
-  "TIK",
-  "Agama Islam",
-  "Agama Kristen",
-  "Agama Katolik",
-  "Agama Hindu",
-  "Agama Buddha",
-  "Agama Konghucu",
-  "Prakarya",
-  "Bimbingan Konseling"
+  "BAHASA INGGRIS",
+  "PJOK",
+  "INFORMATIKA",
+  "SENI, BUDAYA DAN PRAKARYA",
+  "MANDARIN"
 ];
 
 // Assignment status utilities
