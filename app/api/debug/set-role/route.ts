@@ -1,15 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { drizzle } from 'drizzle-orm/node-postgres';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('🔧 Setting admin role via direct SQL...');
 
-    // Import drizzle directly
-    const { drizzle } = require('drizzle-orm/node-postgres');
-    const { pgTable, text, timestamp, boolean } = require('drizzle-orm/pg-core');
-
     // Create connection
-    const db = drizzle(process.env.DATABASE_URL);
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) {
+      throw new Error('DATABASE_URL environment variable is not set');
+    }
+    const db = drizzle(databaseUrl);
 
     // Update user role directly via SQL
     const updateResult = await db.execute(`

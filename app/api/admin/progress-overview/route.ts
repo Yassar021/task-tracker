@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdmin } from '@/lib/admin-auth';
 import { db } from '@/db';
 import { sql } from 'drizzle-orm';
+import { classes } from '@/db/schema/school';
+import { eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +42,7 @@ export async function GET(request: NextRequest) {
         const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
         d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
         const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
         return { weekNumber: weekNo, year: d.getUTCFullYear() };
       };
 
@@ -50,11 +52,11 @@ export async function GET(request: NextRequest) {
       // Get all classes
       const classesResult = await db
         .select({
-          id: db.schema.classes?.id,
-          grade: db.schema.classes?.grade,
+          id: classes.id,
+          grade: classes.grade,
         })
-        .from(db.schema.classes || {})
-        .where((classes, { eq }) => eq(classes.isActive, true));
+        .from(classes)
+        .where(eq(classes.isActive, true));
 
       // Get assignments for the last 4 weeks
       const weeksToShow = [currentWeek.weekNumber - 3, currentWeek.weekNumber - 2, currentWeek.weekNumber - 1, currentWeek.weekNumber];
@@ -95,12 +97,12 @@ export async function GET(request: NextRequest) {
       const totalProgress = Math.round((usedSlots / totalPossibleSlots) * 100);
 
       // Calculate subject distribution
-      const subjectDistribution = {};
+      const subjectDistribution: Record<string, number> = {};
       const typeDistribution = { TUGAS: 0, UJIAN: 0 };
 
       currentWeekAssignments.forEach(assignment => {
         if (assignment.subject) {
-          subjectDistribution[assignment.subject] = (subjectDistribution[assignment.subject] || 0) + 1;
+          subjectDistribution[assignment.subject as string] = (subjectDistribution[assignment.subject as string] || 0) + 1;
         }
         if (assignment.type === 'TUGAS' || assignment.type === 'UJIAN') {
           typeDistribution[assignment.type] = (typeDistribution[assignment.type] || 0) + 1;

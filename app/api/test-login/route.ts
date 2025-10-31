@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         id: result.user.id,
         email: result.user.email,
         name: result.user.name,
-        role: (result.user as any).role
+        role: (result.user as { role?: string }).role
       } : null
     });
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
         id: result.user.id,
         email: result.user.email,
         name: result.user.name,
-        role: (result.user as any).role,
+        role: (result.user as { role?: string }).role,
       }
     });
 

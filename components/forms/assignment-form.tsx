@@ -91,7 +91,7 @@ const assignmentFormSchema = z.object({
 type AssignmentFormData = z.infer<typeof assignmentFormSchema>;
 
 interface ClassStatus {
-  class: any;
+  class: unknown;
   tasks: number;
   exams: number;
   maxTasks: number;
@@ -102,10 +102,20 @@ interface AssignmentFormProps {
   assignment?: Assignment;
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (assignment?: any) => void;
+  onSuccess: (assignment?: unknown) => void;
   teacherId: string;
   currentClassStatuses?: ClassStatus[];
 }
+
+// Helper function for adding learning goal template
+const addLearningGoalTemplate = (
+  template: string,
+  subject: string,
+  setValue: (field: string, value: string) => void
+) => {
+  const goal = template.replace("{subject}", subject);
+  setValue("learningGoal", goal);
+};
 
 export function AssignmentForm({
   assignment,
@@ -286,11 +296,7 @@ export function AssignmentForm({
     };
   };
 
-  const useLearningGoalTemplate = (template: string) => {
-    const goal = template.replace("{subject}", selectedSubject);
-    setValue("learningGoal", goal);
-  };
-
+  
   const onSubmit = async (data: AssignmentFormData) => {
     try {
       setIsSubmitting(true);
@@ -514,7 +520,7 @@ export function AssignmentForm({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => useLearningGoalTemplate(template)}
+                      onClick={() => addLearningGoalTemplate(template, selectedSubject, setValue)}
                     >
                       Gunakan Template
                     </Button>

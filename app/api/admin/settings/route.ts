@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }

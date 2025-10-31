@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function SetupSampleDataPage() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<unknown>(null)
 
   const handleSetupData = async () => {
     setLoading(true)

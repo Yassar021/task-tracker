@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, School, AlertCircle, CheckCircle, Clock, Calendar, BookOpen, Plus } from "lucide-react";
+import { Activity, School, AlertCircle, Clock, Calendar, BookOpen, Plus } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import { Footer } from "@/components/layout/footer";
@@ -32,7 +31,7 @@ const getCurrentWeekNumber = () => {
   const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
   return weekNo;
 };
 
@@ -41,7 +40,7 @@ const getWeekStartDate = () => {
   const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 
   const startDate = new Date(yearStart);
   startDate.setUTCDate(startDate.getUTCDate() + (weekNo - 1) * 7);
@@ -60,7 +59,7 @@ const getWeekEndDate = () => {
   const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
   d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 
   const endDate = new Date(yearStart);
   endDate.setUTCDate(endDate.getUTCDate() + (weekNo - 1) * 7 + 6);
@@ -104,7 +103,7 @@ const getTimeUntilNextReset = () => {
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [classStatus, setClassStatus] = useState<ClassStatus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -412,9 +411,7 @@ export default function AdminDashboard() {
               const totalTasks = classes.reduce((sum, cls) => sum + cls.tasks, 0);
               const totalExams = classes.reduce((sum, cls) => sum + cls.exams, 0);
               const averageLoad = classes.length > 0 ? ((totalTasks + totalExams) / (classes.length * 7)) * 100 : 0;
-              const averageTasks = classes.length > 0 ? totalTasks / classes.length : 0;
-              const averageExams = classes.length > 0 ? totalExams / classes.length : 0;
-              const overloadedClasses = classes.filter(cls => ((cls.tasks + cls.exams) / 7) * 100 >= 100).length;
+                const overloadedClasses = classes.filter(cls => ((cls.tasks + cls.exams) / 7) * 100 >= 100).length;
 
               // Find highest load class
               const classLoads = classes.map(cls => ({

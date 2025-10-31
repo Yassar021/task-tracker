@@ -6,6 +6,12 @@ export async function GET() {
   try {
     console.log('=== DEBUG: Getting table schemas ===');
 
+    if (!db) {
+      return NextResponse.json({
+        error: 'Database not available'
+      }, { status: 500 });
+    }
+
     // Get class_assignments table structure
     const classAssignmentsSchema = await db.execute(sql`
       SELECT column_name, data_type, is_nullable, column_default
@@ -42,8 +48,8 @@ export async function GET() {
   } catch (error) {
     console.error('DEBUG SCHEMA ERROR:', error);
     return NextResponse.json({
-      error: error.message,
-      stack: error.stack
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace available"
     }, { status: 500 });
   }
 }

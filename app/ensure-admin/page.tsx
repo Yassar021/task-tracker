@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function EnsureAdmin() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<unknown>(null)
   const [email, setEmail] = useState('admin@ypssingkole.sch.id')
   const [password, setPassword] = useState('admin123')
 
@@ -100,7 +100,7 @@ export default function EnsureAdmin() {
         <div className="mt-6 text-xs text-gray-500 border-t pt-4">
           <p className="font-semibold mb-2">Instructions:</p>
           <ol className="list-decimal list-inside space-y-1">
-            <li>Click "Ensure Admin User" to create admin account</li>
+            <li>Click &quot;Ensure Admin User&quot; to create admin account</li>
             <li>Once created, go to <a href="/sign-in" className="text-blue-600 hover:underline">login page</a></li>
             <li>Login with email and password above</li>
             <li>You should have admin access</li>

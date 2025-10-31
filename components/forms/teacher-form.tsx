@@ -15,20 +15,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { SMP_SUBJECTS, LEARNING_GOAL_TEMPLATES, validatePhoneNumber, validateEmail } from "@/lib/school-utils";
+import { SMP_SUBJECTS, LEARNING_GOAL_TEMPLATES, validatePhoneNumber } from "@/lib/school-utils";
 import type { Teacher } from "@/db/schema/school";
 
 // Form validation schema
@@ -48,6 +40,22 @@ interface TeacherFormProps {
   onClose: () => void;
   onSuccess: () => void;
 }
+
+// Helper function for adding learning goal template
+const addLearningGoalTemplate = (
+  template: string,
+  subject: string,
+  currentGoals: string[],
+  setGoals: (goals: string[]) => void,
+  setValue: (field: string, value: string[]) => void
+) => {
+  const goal = template.replace("{subject}", subject);
+  if (!currentGoals.includes(goal)) {
+    const newGoals = [...currentGoals, goal];
+    setGoals(newGoals);
+    setValue("learningGoals", newGoals);
+  }
+};
 
 export function TeacherForm({ teacher, isOpen, onClose, onSuccess }: TeacherFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,15 +120,7 @@ export function TeacherForm({ teacher, isOpen, onClose, onSuccess }: TeacherForm
     setValue("learningGoals", newGoals);
   };
 
-  const useLearningGoalTemplate = (template: string, subject: string) => {
-    const goal = template.replace("{subject}", subject);
-    if (!learningGoals.includes(goal)) {
-      const newGoals = [...learningGoals, goal];
-      setLearningGoals(newGoals);
-      setValue("learningGoals", newGoals);
-    }
-  };
-
+  
   const onSubmit = async (data: TeacherFormData) => {
     try {
       setIsSubmitting(true);
@@ -318,7 +318,7 @@ export function TeacherForm({ teacher, isOpen, onClose, onSuccess }: TeacherForm
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => useLearningGoalTemplate(template, selectedSubjects[0])}
+                      onClick={() => addLearningGoalTemplate(template, selectedSubjects[0], learningGoals, setLearningGoals, setValue)}
                     >
                       + {template.replace("{subject}", selectedSubjects[0])}
                     </Button>

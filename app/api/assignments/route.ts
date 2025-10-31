@@ -138,9 +138,9 @@ export async function POST(request: NextRequest) {
     console.error('Full error:', error);
 
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error.errors);
+      console.error('Validation error:', error.issues);
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to create assignment',
-        details: error.message
+        details: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
     );

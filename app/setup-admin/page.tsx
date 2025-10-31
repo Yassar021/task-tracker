@@ -6,7 +6,7 @@ export default function SetupAdmin() {
   const [email, setEmail] = useState('admin@ypssingkole.sch.id')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<unknown>(null)
 
   const handleSetupAdmin = async () => {
     setLoading(true)
@@ -105,7 +105,7 @@ export default function SetupAdmin() {
           <p className="font-semibold mb-2">Instructions:</p>
           <ol className="list-decimal list-inside space-y-1">
             <li>Enter admin email and password</li>
-            <li>Click "Create Admin User"</li>
+            <li>Click &quot;Create Admin User&quot;</li>
             <li>Once created, go to login page and sign in</li>
             <li>After login, you should have admin access</li>
           </ol>

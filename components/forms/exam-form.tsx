@@ -58,6 +58,16 @@ interface ExamFormProps {
   teacherId: string;
 }
 
+// Helper function for adding learning goal template
+const addLearningGoalTemplate = (
+  template: string,
+  subject: string,
+  setValue: (field: string, value: string) => void
+) => {
+  const goal = template.replace("{subject}", subject);
+  setValue("learningGoal", goal);
+};
+
 export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProps) {
   const [classes, setClasses] = useState<Class[]>([]);
   const [currentWeekInfo, setCurrentWeekInfo] = useState<{ weekNumber: number; year: number } | null>(null);
@@ -234,10 +244,7 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
     `Siswa dapat menganalisis masalah ${selectedSubject.toLowerCase()}`,
   ] : [];
 
-  const useLearningGoalTemplate = (template: string) => {
-    form.setValue("learningGoal", template);
-  };
-
+  
   if (!isOpen) return null;
 
   return (
@@ -265,7 +272,7 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
 
             <div>
               <Label htmlFor="examType">Jenis Ujian</Label>
-              <Select value={form.watch("examType")} onValueChange={(value) => form.setValue("examType", value as any)}>
+              <Select value={form.watch("examType")} onValueChange={(value) => form.setValue("examType", value as "SUMATIF" | "UTS" | "UAS")}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih jenis ujian" />
                 </SelectTrigger>
@@ -354,7 +361,7 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => useLearningGoalTemplate(template)}
+                    onClick={() => addLearningGoalTemplate(template, selectedSubject, form.setValue)}
                   >
                     Gunakan Template
                   </Button>

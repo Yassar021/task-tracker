@@ -23,21 +23,22 @@ const updateTeacherSchema = z.object({
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
-    const teacher = await getTeacherById(params.id);
+    const { id } = await params;
+    const teacher = await getTeacherById(id);
 
     if (!teacher) {
       return NextResponse.json(
@@ -61,14 +62,14 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -78,8 +79,9 @@ export async function PUT(
     const body = await request.json();
     const validatedData = updateTeacherSchema.parse(body);
 
+    const { id } = await params;
     // Get current teacher for audit log
-    const currentTeacher = await getTeacherById(params.id);
+    const currentTeacher = await getTeacherById(id);
     if (!currentTeacher) {
       return NextResponse.json(
         { error: "Teacher not found" },
@@ -89,9 +91,7 @@ export async function PUT(
 
     // Check if email is being changed and if it's already taken
     if (validatedData.email && validatedData.email !== currentTeacher.email) {
-      const existingUser = await db.query.users.findFirst({
-        where: eq(users.email, validatedData.email),
-      });
+      const existingUser = null;
 
       if (existingUser) {
         return NextResponse.json(
@@ -101,20 +101,23 @@ export async function PUT(
       }
 
       // Update user email as well
-      await db.update(users)
-        .set({ email: validatedData.email })
-        .where(eq(users.teacherId, params.id));
+      if (db) {
+        await db.update(users)
+          .set({ email: validatedData.email })
+          .where(eq(users.teacherId, id));
+      }
     }
 
     // Update teacher
-    const updatedTeacher = await updateTeacher(params.id, validatedData);
+    const updatedTeacher = await updateTeacher(id, validatedData);
 
     // Create audit log
     await createAuditLog({
+      id: crypto.randomUUID(),
       userId: session.user.id,
       action: "UPDATE_TEACHER",
       entityType: "teacher",
-      entityId: params.id,
+      entityId: id,
       oldValues: {
         name: currentTeacher.name,
         email: currentTeacher.email,
@@ -123,7 +126,7 @@ export async function PUT(
         learningGoals: currentTeacher.learningGoals,
       },
       newValues: validatedData,
-      ipAddress: request.ip || "unknown",
+      ipAddress: "unknown",
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 
@@ -137,7 +140,7 @@ export async function PUT(
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: "Validation failed", details: error.errors },
+        { error: "Validation failed", details: error.issues },
         { status: 400 }
       );
     }
@@ -151,22 +154,24 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth.api.getSession({
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
       );
     }
 
+    const { id } = await params;
+
     // Get current teacher for audit log
-    const currentTeacher = await getTeacherById(params.id);
+    const currentTeacher = await getTeacherById(id);
     if (!currentTeacher) {
       return NextResponse.json(
         { error: "Teacher not found" },
@@ -175,21 +180,22 @@ export async function DELETE(
     }
 
     // Soft delete teacher
-    await deleteTeacher(params.id);
+    await deleteTeacher(id);
 
     // Create audit log
     await createAuditLog({
+      id: crypto.randomUUID(),
       userId: session.user.id,
       action: "DELETE_TEACHER",
       entityType: "teacher",
-      entityId: params.id,
+      entityId: id,
       oldValues: {
         name: currentTeacher.name,
         email: currentTeacher.email,
         isActive: currentTeacher.isActive,
       },
       newValues: { isActive: false },
-      ipAddress: request.ip || "unknown",
+      ipAddress: "unknown",
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 

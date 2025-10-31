@@ -6,6 +6,13 @@ export async function GET(request: NextRequest) {
   try {
     console.log('=== DEBUG: Starting simple assignments API ===');
 
+    if (!db) {
+      return NextResponse.json({
+        error: 'Database not available',
+        debug: { db: null }
+      }, { status: 500 });
+    }
+
     // Test database connection
     console.log('Testing database connection...');
     const testResult = await db.select().from(assignments).limit(1);
@@ -28,16 +35,16 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('=== DEBUG: Simple assignments API ERROR ===');
     console.error('Error type:', typeof error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
+    console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+    console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace available');
 
     return NextResponse.json(
       {
         error: 'Failed to fetch assignments',
         debug: {
-          errorMessage: error.message,
-          errorName: error.name,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
+          errorName: error instanceof Error ? error.name : 'Unknown',
           errorType: typeof error,
           hasDb: !!db,
           hasAssignmentsTable: !!assignments

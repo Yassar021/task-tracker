@@ -35,7 +35,7 @@ import {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
   const [isSupabaseAdmin, setIsSupabaseAdmin] = React.useState(false)
-  const [currentUser, setCurrentUser] = React.useState<any>(null)
+  const [currentUser, setCurrentUser] = React.useState<unknown>(null)
 
   // Check Supabase session and admin status
   React.useEffect(() => {

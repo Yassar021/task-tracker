@@ -70,7 +70,7 @@ export function handleApiError(error: unknown): {
   error: string;
   code?: string;
   statusCode: number;
-  details?: any;
+  details?: unknown;
 } {
   if (error instanceof AppError) {
     return {
@@ -108,7 +108,7 @@ export function handleApiError(error: unknown): {
 /**
  * Safe async handler wrapper for API routes
  */
-export function withErrorHandler<T extends any[], R>(
+export function withErrorHandler<T extends unknown[], R>(
   handler: (...args: T) => Promise<R>
 ) {
   return async (...args: T): Promise<R> => {
@@ -185,7 +185,7 @@ export function safeJsonParse<T>(jsonString: string, fallback?: T): T | null {
 /**
  * Error logger for monitoring
  */
-export function logError(error: Error, context?: Record<string, any>) {
+export function logError(error: Error, context?: Record<string, unknown>) {
   const errorLog = {
     message: error.message,
     stack: error.stack,

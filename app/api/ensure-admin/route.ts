@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       // If user already exists, that's okay
-      if (error.message.includes('already registered')) {
+      if (error instanceof Error && error.message.includes('already registered')) {
         return NextResponse.json({
           success: true,
           message: 'Admin user already exists',
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Ensure admin error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to ensure admin user' },
+      { error: error instanceof Error ? error.message : 'Failed to ensure admin user' },
       { status: 500 }
     );
   }

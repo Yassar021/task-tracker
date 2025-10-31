@@ -1,4 +1,3 @@
-import { type Class } from "@/db/schema/school";
 
 // Class configuration based on PRD
 export const CLASS_NAMES = [
@@ -260,10 +259,10 @@ export function exportToCSV<T>(
 
   const csvHeaders = headers
     ? Object.values(headers).join(',')
-    : Object.keys(data[0] as Record<string, any>).join(',');
+    : Object.keys(data[0] as Record<string, unknown>).join(',');
 
   const csvRows = data.map(row =>
-    Object.values(row as Record<string, any>)
+    Object.values(row as Record<string, unknown>)
       .map(value => `"${value}"`)
       .join(',')
   );

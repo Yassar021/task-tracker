@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: 'Failed to setup sample data',
-        details: error.message
+        details: error instanceof Error ? error.message : "Unknown error"
       },
       { status: 500 }
     );

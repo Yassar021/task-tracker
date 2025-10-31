@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 
 // Temporary auth config without database adapter
 // We'll use Supabase directly for auth operations
-const authConfig: any = {
+const authConfig: Record<string, unknown> = {
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: false, // For school environment, we can disable this

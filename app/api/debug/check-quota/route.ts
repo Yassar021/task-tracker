@@ -7,10 +7,10 @@ export async function POST(request: NextRequest) {
 
     // Mock response for testing
     const { classIds } = body;
-    const quotas = {};
+    const quotas: Record<string, { used: number; max: number }> = {};
 
     // Since we know 7-DIS has 2 tasks (from debug data), let's mock that
-    classIds.forEach(classId => {
+    classIds.forEach((classId: string) => {
       if (classId === '7-DIS') {
         quotas[classId] = {
           used: 2,
@@ -30,6 +30,6 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('DEBUG check-quota error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }

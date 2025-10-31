@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
       d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
       const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
       return { weekNumber: weekNo, year: d.getUTCFullYear() };
     };
 
@@ -154,7 +154,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('❌ DEBUG: Error in class status API:', error);
     return NextResponse.json({
-      error: error.message,
+      error: error instanceof Error ? error.message : "Unknown error",
       dbStatus: 'error',
       classStatus: []
     }, { status: 500 });

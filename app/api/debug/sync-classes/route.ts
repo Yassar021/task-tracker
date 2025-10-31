@@ -33,6 +33,12 @@ export async function POST() {
       { id: '9-IND', grade: 9, name: 'INDEPENDENT' },
     ];
 
+    if (!db) {
+      return NextResponse.json({
+        error: 'Database not available'
+      }, { status: 500 });
+    }
+
     // Get existing classes
     const existingClassesResult = await db.execute(sql`
       SELECT id FROM classes
@@ -69,8 +75,8 @@ export async function POST() {
   } catch (error) {
     console.error('SYNC CLASSES ERROR:', error);
     return NextResponse.json({
-      error: error.message,
-      stack: error.stack
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace available"
     }, { status: 500 });
   }
 }

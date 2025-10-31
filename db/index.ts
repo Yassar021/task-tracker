@@ -112,7 +112,7 @@ if (OFFLINE_MODE) {
         client.release();
         console.log('✅ Database connection test successful');
       } catch (error) {
-        console.warn('❌ Database connection test failed:', error.message);
+        console.warn('❌ Database connection test failed:', error instanceof Error ? error.message : "Unknown error");
         console.warn('⚠️  Application will run in limited mode without database');
         // Don't throw error, just log it and continue with demo mode
       }

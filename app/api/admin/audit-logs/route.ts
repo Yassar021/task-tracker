@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
       headers: request.headers,
     });
 
-    if (!session?.user?.id || session.user.role !== 'admin') {
+    if (!session?.user?.id || (session.user as { role?: string }).role !== 'admin') {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
     }
 

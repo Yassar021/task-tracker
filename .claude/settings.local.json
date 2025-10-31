@@ -23,7 +23,8 @@
       "Bash(nslookup:*)",
       "WebFetch(domain:supabase.com)",
       "Bash(npm install:*)",
-      "Bash(DATABASE_URL=postgresql://postgres:xWFFUObx2XlW25b4@db.klfuyvwfgyzaaattsjxc.supabase.co:5432/postgres?sslmode=require)"
+      "Bash(DATABASE_URL=postgresql://postgres:xWFFUObx2XlW25b4@db.klfuyvwfgyzaaattsjxc.supabase.co:5432/postgres?sslmode=require)",
+      "Bash(echo:*)"
     ],
     "deny": [],
     "ask": []

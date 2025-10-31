@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Error in check-admin API:', error);
-    console.error('Stack trace:', error.stack);
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
     return NextResponse.json({
       error: 'Internal server error',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: process.env.NODE_ENV === 'development' ? (error instanceof Error ? error.message : "Unknown error") : undefined
     }, { status: 500 });
   }
 }

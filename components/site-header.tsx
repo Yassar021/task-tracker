@@ -3,14 +3,13 @@
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
-import { useSession, signOut } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth-client"
 import { getCurrentUser, isAdmin, signOut as supabaseSignOut } from "@/lib/client-auth"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
   Bell,
   Search,
-  Settings,
   User,
   LogOut,
   Sun,
@@ -18,7 +17,6 @@ import {
   Home,
   BookOpen,
   Calendar,
-  Users,
   BarChart3,
   FileText
 } from "lucide-react"
@@ -37,7 +35,7 @@ export function SiteHeader() {
   const { theme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<unknown>(null)
 
   // Check Supabase session and admin status
   React.useEffect(() => {

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       headers: request.headers,
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -38,12 +38,13 @@ export async function POST(request: NextRequest) {
 
     // Create audit log
     await createAuditLog({
+      id: crypto.randomUUID(),
       userId: session.user.id,
       action: "INITIALIZE_CLASSES",
       entityType: "class",
       entityId: "system",
       newValues: { classesCreated: createdClasses.length },
-      ipAddress: request.ip || "unknown",
+      ipAddress: "unknown",
       userAgent: request.headers.get("user-agent") || "unknown",
     });
 

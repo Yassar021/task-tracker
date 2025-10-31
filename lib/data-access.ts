@@ -1,24 +1,7 @@
 import { db, users, teachers, classes, assignments, classAssignments, settings, auditLogs } from "@/db";
-import { eq, and, gte, lte, count, desc, ilike } from "drizzle-orm";
-import {
-  getCurrentWeekInfo,
-  formatDate,
-  getAssignmentStatusLabel,
-  getAssignmentStatusColor,
-} from "@/lib/school-utils";
-import { safeDbOperation, DatabaseError } from "@/lib/error-handling";
-
-// Re-export utility functions for dashboard
-export {
-  getCurrentWeekInfo,
-  formatDate,
-  getAssignmentStatusColor,
-  getAssignmentStatusLabel,
-} from "@/lib/school-utils";
+import { eq, and, count, desc } from "drizzle-orm";
+import { safeDbOperation } from "@/lib/error-handling";
 import type {
-  Teacher, NewTeacher,
-  User, NewUser,
-  Class, NewClass,
   Assignment, NewAssignment,
   ClassAssignment, NewClassAssignment,
   Setting, NewSetting,
@@ -143,19 +126,17 @@ export async function getAssignmentsByTeacher(teacherId: string) {
 }
 
 export async function getAssignmentsByClass(classId: string, weekNumber?: number, year?: number) {
-  let whereConditions = [eq(classAssignments.classId, classId)];
+  const baseConditions = [eq(classAssignments.classId, classId)];
 
-  if (weekNumber && year) {
-    whereConditions.push(
-      and(
+  const additionalConditions = weekNumber && year
+    ? [and(
         eq(assignments.weekNumber, weekNumber),
         eq(assignments.year, year)
-      )
-    );
-  }
+      )]
+    : [];
 
   return await db.query.classAssignments.findMany({
-    where: and(...whereConditions),
+    where: and(...baseConditions, ...additionalConditions),
     with: {
       assignment: {
         with: {

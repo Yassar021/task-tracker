@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
 
       // Calculate full weeks to nearest Thursday
-      const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+      const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 
       return {
         weekNumber: weekNo,
@@ -73,29 +73,33 @@ export async function GET(request: NextRequest) {
 
       for (const row of assignmentClasses || []) {
         const assignment = row.assignments;
-        if (!assignmentsMap.has(assignment.id)) {
-          assignmentsMap.set(assignment.id, {
-            id: assignment.id,
-            title: assignment.title,
-            subject: assignment.subject,
-            type: assignment.type,
-            weekNumber: assignment.week_number,
-            year: assignment.year,
-            status: assignment.status,
-            createdAt: assignment.created_at,
-            learningGoal: assignment.learning_goal,
-            description: assignment.description,
+        // Handle case where assignments might be an array (Supabase relationship)
+        const assignmentData = Array.isArray(assignment) ? assignment[0] : assignment;
+        if (!assignmentData || !assignmentData.id) continue;
+
+        if (!assignmentsMap.has(assignmentData.id)) {
+          assignmentsMap.set(assignmentData.id, {
+            id: assignmentData.id,
+            title: assignmentData.title,
+            subject: assignmentData.subject,
+            type: assignmentData.type,
+            weekNumber: assignmentData.week_number,
+            year: assignmentData.year,
+            status: assignmentData.status,
+            createdAt: assignmentData.created_at,
+            learningGoal: assignmentData.learning_goal,
+            description: assignmentData.description,
             classAssignments: []
           });
         }
 
-        assignmentsMap.get(assignment.id).classAssignments.push({
+        assignmentsMap.get(assignmentData.id).classAssignments.push({
           classId: row.class_id
         });
       }
 
       const assignments = Array.from(assignmentsMap.values())
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by created_at descending
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); // Sort by created_at descending
 
       console.log(`Found ${assignments.length} real assignments for week ${currentWeek.weekNumber}, year ${currentWeek.year}`);
 
@@ -118,20 +122,20 @@ export async function GET(request: NextRequest) {
           isSampleData: false,
           weekInfo: currentWeek,
           error: 'Supabase query failed, returning empty',
-          errorMessage: supabaseError.message
+          errorMessage: supabaseError instanceof Error ? supabaseError.message : 'Unknown error'
         }
       });
     }
   } catch (error) {
     console.error('=== HOME ASSIGNMENTS API ERROR ===');
     console.error('Full error:', error);
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
+    console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace available');
     return NextResponse.json(
       {
         error: 'Failed to fetch assignments',
-        details: error.message,
-        stack: error.stack
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace available'
       },
       { status: 500 }
     );

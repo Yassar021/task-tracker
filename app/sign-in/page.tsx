@@ -133,13 +133,13 @@ export default function SignInPage() {
                 });
                 setError(result.error || "Login failed");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             toast.error("Terjadi kesalahan teknis", {
-                description: err.message || "Silakan coba lagi beberapa saat",
+                description: err instanceof Error ? err.message : "Silakan coba lagi beberapa saat",
                 icon: <AlertCircle className="h-4 w-4" />,
                 duration: 5000,
             });
-            setError(err.message || "An unexpected error occurred");
+            setError(err instanceof Error ? err.message : "An unexpected error occurred");
         } finally {
             setIsLoading(false);
         }

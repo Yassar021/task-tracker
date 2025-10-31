@@ -7,6 +7,12 @@ export async function POST(request: NextRequest) {
   try {
     console.log('🔄 Resetting admin account...');
 
+    if (!db) {
+      return NextResponse.json({
+        error: 'Database not available'
+      }, { status: 500 });
+    }
+
     // Delete existing admin user
     await db.delete(users).where(eq(users.email, 'admin@ypssingkole.sch.id'));
     console.log('🗑️ Deleted existing admin user');
@@ -41,10 +47,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (testAuth.error) {
+    // Check if authentication was successful
+    if (!testAuth || !testAuth.user) {
       return NextResponse.json({
         error: 'Account created but authentication test failed',
-        authError: testAuth.error.message,
         user: {
           id: newAdmin.user.id,
           email: newAdmin.user.email,

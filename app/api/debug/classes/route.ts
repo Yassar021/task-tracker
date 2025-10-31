@@ -6,6 +6,13 @@ export async function GET() {
   try {
     console.log('=== DEBUG: Getting all classes ===');
 
+    if (!db) {
+      return NextResponse.json({
+        error: 'Database not available',
+        debugInfo: { db: null }
+      }, { status: 500 });
+    }
+
     // Get all classes
     const allClasses = await db.execute(sql`
       SELECT id, grade, name, is_active
@@ -32,8 +39,8 @@ export async function GET() {
   } catch (error) {
     console.error('DEBUG CLASSES ERROR:', error);
     return NextResponse.json({
-      error: error.message,
-      stack: error.stack
+      error: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : "No stack trace available"
     }, { status: 500 });
   }
 }

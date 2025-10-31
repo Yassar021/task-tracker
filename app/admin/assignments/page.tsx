@@ -78,7 +78,7 @@ export default function AssignmentsPage() {
     const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
     return { weekNumber: weekNo, year: d.getUTCFullYear() };
   };
 
@@ -122,7 +122,7 @@ export default function AssignmentsPage() {
         // Apply manual status overrides
         updatedAssignments = updatedAssignments.map(assignment => ({
           ...assignment,
-          status: assignmentStatusOverrides[assignment.id] || assignment.status
+          status: (assignmentStatusOverrides[assignment.id] || assignment.status) as "published" | "not_evaluated" | "evaluated"
         }));
 
         setAssignments(updatedAssignments);
@@ -136,7 +136,7 @@ export default function AssignmentsPage() {
           // Apply manual status overrides for fallback data
           updatedAssignments = updatedAssignments.map(assignment => ({
             ...assignment,
-            status: assignmentStatusOverrides[assignment.id] || assignment.status
+            status: (assignmentStatusOverrides[assignment.id] || assignment.status) as "published" | "not_evaluated" | "evaluated"
           }));
 
           setAssignments(updatedAssignments);
@@ -507,9 +507,9 @@ export default function AssignmentsPage() {
                             <div className="flex flex-wrap gap-1">
                               {assignment.class_assignments.map((ca, index) => (
                                 <Badge key={index} variant="secondary">
-                                  {ca.classes ? (
+                                  {ca.class_name ? (
                                     <>
-                                      {ca.classes.grade} - {ca.classes.name}
+                                      {ca.class_name}
                                     </>
                                   ) : (
                                     ca.class_id
@@ -626,12 +626,12 @@ export default function AssignmentsPage() {
                 {selectedAssignment.class_assignments && selectedAssignment.class_assignments.length > 0 ? (
                   selectedAssignment.class_assignments.map((ca, index) => (
                     <span key={index} className="ml-1">
-                      {ca.classes ? (
-                        <>Kelas {ca.classes.grade} - {ca.classes.name}</>
+                      {ca.class_name ? (
+                        <>Kelas {ca.class_name}</>
                       ) : (
                         ca.class_id
                       )}
-                      {index < selectedAssignment.class_assignments.length - 1 && ', '}
+                      {index < (selectedAssignment.class_assignments?.length || 0) - 1 && ', '}
                     </span>
                   ))
                 ) : (

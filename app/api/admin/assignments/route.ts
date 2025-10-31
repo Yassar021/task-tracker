@@ -86,9 +86,9 @@ export async function GET(request: NextRequest) {
     const formattedAssignments = assignments?.map(assignment => ({
       ...assignment,
       status: statusMapping[assignment.status] || assignment.status,
-      class_assignments: assignment.class_assignments?.map(ca => ({
-        class_id: ca.class_id,
-        classes: ca.classes || null
+      class_assignments: assignment.class_assignments?.map((ca: unknown) => ({
+        class_id: (ca as { class_id: string; classes?: unknown }).class_id,
+        classes: (ca as { class_id: string; classes?: unknown }).classes || null
       })) || []
     })) || [];
 
@@ -113,7 +113,7 @@ export async function GET(request: NextRequest) {
     const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
     const currentWeek = { weekNumber: weekNo, year: d.getUTCFullYear() };
 
     // Return mock data as fallback
