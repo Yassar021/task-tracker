@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180">
+  <!-- Background Rounded Square -->
+  <rect x="10" y="10" width="160" height="160" rx="20" fill="#2563eb" stroke="#1e40af" stroke-width="2"/>
+
+  <!-- Book Icon (larger) -->
+  <path d="M45 50C45 46.6863 47.6863 44 51 44H129C132.314 44 135 46.6863 135 50V110C135 113.314 132.314 116 129 116H51C47.6863 116 45 113.314 45 110V50Z" fill="white"/>
+  <path d="M45 50C45 46.6863 47.6863 44 51 44H90V116H51C47.6863 116 45 113.314 45 110V50Z" fill="#e0f2fe"/>
+
+  <!-- Checkmark (larger) -->
+  <circle cx="112" cy="96" r="18" fill="#10b981"/>
+  <path d="M102 96L109.5 103.5L124 84" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- YPS Text (larger) -->
+  <text x="90" y="155" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#1e40af" text-anchor="middle">YPS</text>
+  <text x="90" y="155" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle" stroke="#1e40af" stroke-width="0.5">YPS</text>
+</svg>

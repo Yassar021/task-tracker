@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16">
+  <!-- Background Circle -->
+  <circle cx="8" cy="8" r="7.5" fill="#2563eb" stroke="#1e40af" stroke-width="0.5"/>
+
+  <!-- Book Icon -->
+  <path d="M4 3.5C4 3.22386 4.22386 3 4.5 3H11.5C11.7761 3 12 3.22386 12 3.5V10.5C12 10.7761 11.7761 11 11.5 11H4.5C4.22386 11 4 10.7761 4 10.5V3.5Z" fill="white"/>
+  <path d="M4 3.5C4 3.22386 4.22386 3 4.5 3H8V11H4.5C4.22386 11 4 10.7761 4 10.5V3.5Z" fill="#e0f2fe"/>
+
+  <!-- Checkmark -->
+  <circle cx="10" cy="8.5" r="2" fill="#10b981"/>
+  <path d="M9 8.5L9.75 9.25L11 7.5" stroke="white" stroke-width="0.75" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- YPS Text -->
+  <text x="8" y="14" font-family="Arial, sans-serif" font-size="3" font-weight="bold" fill="#1e40af" text-anchor="middle">YPS</text>
+</svg>

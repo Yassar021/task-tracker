@@ -1,0 +1,37 @@
+{
+  "name": "SMP YPS SOROAKO - Manajemen Tugas & Ujian",
+  "short_name": "YPS Task Tracker",
+  "description": "Aplikasi manajemen tugas dan ujian untuk SMP YPS SOROAKO dengan sistem batas mingguan dan integrasi WhatsApp",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2563eb",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "id-ID",
+  "scope": "/",
+  "prefer_related_applications": false
+}

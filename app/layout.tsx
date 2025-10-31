@@ -23,9 +23,20 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SMP YPS SINGKOLE - Manajemen Tugas & Ujian",
+  title: "SMP YPS SOROAKO - Manajemen Tugas & Ujian",
   description:
-    "Aplikasi manajemen tugas dan ujian untuk SMP YPS SINGKOLE dengan sistem batas mingguan dan integrasi WhatsApp",
+    "Aplikasi manajemen tugas dan ujian untuk SMP YPS SOROAKO dengan sistem batas mingguan dan integrasi WhatsApp",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({
