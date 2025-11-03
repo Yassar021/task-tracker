@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,12 +23,10 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Users,
   BookOpen,
   Plus
 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "@/lib/auth-client";
 import { Footer } from "@/components/layout/footer";
 
 interface Assignment {
@@ -56,13 +54,8 @@ interface Assignment {
 }
 
 export default function AssignmentsPage() {
-  const { data: session } = useSession();
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterSubject, setFilterSubject] = useState<string>("");
-  const [filterType, setFilterType] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedAssignments, setSelectedAssignments] = useState<string[]>([]);
@@ -86,25 +79,24 @@ export default function AssignmentsPage() {
 
   const itemsPerPage = 10;
 
-  // Function to auto-update status based on week change
-  const updateStatusBasedOnWeek = (assignments: Assignment[]): Assignment[] => {
-    return assignments.map(assignment => {
-      const assignmentWeek = assignment.week_number;
-      const currentWeekInfo = getCurrentWeekInfo();
-
-      // Only auto-update if assignment is from previous week and still published
-      // Don't override admin's manual changes (evaluated status)
-      if (assignmentWeek < currentWeekInfo.weekNumber && assignment.status === 'published') {
-        console.log(`Auto-updating assignment ${assignment.id} from published to not_evaluated (week ${assignmentWeek} < ${currentWeekInfo.weekNumber})`);
-        return { ...assignment, status: 'not_evaluated' };
-      }
-
-      return assignment;
-    });
-  };
-
   // Fetch assignments from API
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
+    // Function to auto-update status based on week change
+    const updateStatusBasedOnWeek = (assignments: Assignment[]): Assignment[] => {
+      return assignments.map(assignment => {
+        const assignmentWeek = assignment.week_number;
+        const currentWeekInfo = getCurrentWeekInfo();
+
+        // Only auto-update if assignment is from previous week and still published
+        // Don't override admin's manual changes (evaluated status)
+        if (assignmentWeek < currentWeekInfo.weekNumber && assignment.status === 'published') {
+          console.log(`Auto-updating assignment ${assignment.id} from published to not_evaluated (week ${assignmentWeek} < ${currentWeekInfo.weekNumber})`);
+          return { ...assignment, status: 'not_evaluated' };
+        }
+
+        return assignment;
+      });
+    };
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -151,11 +143,11 @@ export default function AssignmentsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, assignmentStatusOverrides]);
 
   useEffect(() => {
     fetchAssignments();
-  }, [currentPage]);
+  }, [fetchAssignments]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -10,7 +10,7 @@ import {
   IconFileText,
   IconCalendar,
   IconUsers,
-  IconBookOpen,
+  IconBook,
   IconChartBar,
   IconSettings,
   IconLogout,
@@ -56,9 +56,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Define navigation based on user role
   const getNavItems = () => {
     // Check if user is admin (either from Better Auth or Supabase)
-    const isAdminUser = session?.user?.role === "admin" || isSupabaseAdmin
+    const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin
 
-    if (!session?.user?.role && !currentUser) {
+    if (!(session?.user as { role?: string })?.role && !currentUser) {
       // Guest user - minimal navigation
       return [
         {
@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {
           title: "Kelas",
           url: "/admin/classes",
-          icon: IconBookOpen,
+          icon: IconBook,
         },
         {
           title: "Tugas",
@@ -125,13 +125,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {
         title: "Kelas",
         url: "/classes",
-        icon: IconBookOpen,
+        icon: IconBook,
       },
     ];
   };
 
   const userData = (session?.user || currentUser) ? {
-    name: session?.user?.name || currentUser?.user_metadata?.name || session?.user?.email?.split('@')[0] || currentUser?.email?.split('@')[0] || "Admin",
+    name: session?.user?.name || (currentUser as any)?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as any)?.email?.split('@')[0] || "Admin",
     email: session?.user?.email || currentUser?.email || "admin@ypssingkole.sch.id",
     avatar: session?.user?.image || "/codeguide-logo.png",
   } : {

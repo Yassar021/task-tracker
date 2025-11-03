@@ -9,7 +9,7 @@ async function testClassesAPI() {
     const data = await response.json()
     return { success: response.ok, data }
   } catch (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -21,7 +21,7 @@ async function testAssignmentsAPI() {
     const data = await response.json()
     return { success: response.ok, data }
   } catch (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -35,7 +35,7 @@ async function testDirectSupabase() {
 
     return { success: !error, data: data || [], error }
   } catch (error) {
-    return { success: false, error: error.message }
+    return { success: false, error: error instanceof Error ? error.message : String(error) }
   }
 }
 
@@ -95,7 +95,7 @@ export default async function TestAPIs() {
                 </p>
               )}
               {!directSupabaseResult.success && (
-                <p className="text-sm text-red-600">{directSupabaseResult.error}</p>
+                <p className="text-sm text-red-600">{typeof directSupabaseResult.error === 'string' ? directSupabaseResult.error : JSON.stringify(directSupabaseResult.error)}</p>
               )}
             </div>
           </div>

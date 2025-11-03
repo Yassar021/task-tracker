@@ -31,7 +31,7 @@ const safeJsonParse = async (response: Response) => {
     return JSON.parse(text);
   } catch (error) {
     console.error('JSON parsing failed:', error);
-    throw new Error(`Failed to parse JSON response: ${error.message}`);
+    throw new Error(`Failed to parse JSON response: ${error instanceof Error ? error.message : String(error)}`);
   }
 };
 
@@ -62,6 +62,7 @@ interface ClassStatus {
   exams: number;
   maxTasks: number;
   maxExams: number;
+  updateCounter?: number;
 }
 
 export default function HomePage() {

@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 export default function EnsureAdmin() {
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<unknown>(null)
+  const [result, setResult] = useState<{ success: boolean; message?: string; error?: string; action?: string } | null>(null)
   const [email, setEmail] = useState('admin@ypssingkole.sch.id')
   const [password, setPassword] = useState('admin123')
 

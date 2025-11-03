@@ -6,7 +6,7 @@ export default function SetupAdmin() {
   const [email, setEmail] = useState('admin@ypssingkole.sch.id')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<unknown>(null)
+  const [result, setResult] = useState<{ success: boolean; message?: string; error?: string; user?: { id: string; email: string; email_confirmed?: boolean } } | null>(null)
 
   const handleSetupAdmin = async () => {
     setLoading(true)

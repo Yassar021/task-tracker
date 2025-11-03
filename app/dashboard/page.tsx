@@ -96,7 +96,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (session?.user?.role === "admin") {
+    if ((session?.user as { role?: string })?.role === "admin") {
       window.location.href = "/admin";
       return;
     }

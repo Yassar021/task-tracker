@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -19,23 +18,17 @@ import {
   Cell,
   LineChart,
   Line,
-  Area,
-  AreaChart,
   Legend
 } from "recharts";
 import {
   TrendingUp,
-  TrendingDown,
   BarChart3,
   PieChart as PieChartIcon,
   Calendar,
-  Users,
   AlertTriangle,
   CheckCircle,
-  Clock,
   BookOpen,
   Download,
-  Filter,
   RefreshCw
 } from "lucide-react";
 import { Footer } from "@/components/layout/footer";
@@ -87,7 +80,6 @@ const COLORS = {
 };
 
 export default function AnalyticsPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState("current");
   const [selectedGrade, setSelectedGrade] = useState("all");
   const [refreshing, setRefreshing] = useState(false);
 
