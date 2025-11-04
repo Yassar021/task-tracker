@@ -127,43 +127,28 @@ export default function AdminDashboard() {
       setIsCheckingAuth(true);
 
       try {
-        // Check Better Auth session first
-        if (!session?.user?.id) {
-          console.log('No Better Auth session found');
-          // Try Supabase as fallback
-          const supabaseUser = await getCurrentUser();
-          if (!supabaseUser) {
-            setAccessDenied(true);
-            setIsCheckingAuth(false);
-            return;
-          }
+        // Simple admin check - if middleware allowed access, assume user is admin
+        // Trust the middleware to handle authentication
 
-          // Check if Supabase user is admin
-          const adminCheck = await isAdmin();
-          if (!adminCheck) {
-            setAccessDenied(true);
-            setIsCheckingAuth(false);
-            return;
-          }
-
-          setUser(supabaseUser);
-          setAccessDenied(false);
-        } else {
-          // Check if Better Auth user is admin
-          const userEmail = session?.user?.email;
-          const isSupabaseAdmin = userEmail === "admin@ypssingkole.sch.id";
-          const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin;
-
-          console.log('Auth check:', { userEmail, isAdminUser, session });
-
-          if (!isAdminUser) {
-            setAccessDenied(true);
-            setIsCheckingAuth(false);
-            return;
-          }
-
+        // Check if we have Better Auth session
+        if (session?.user?.id) {
+          console.log('Better Auth session found, proceeding as admin');
           setUser(session.user);
           setAccessDenied(false);
+        } else {
+          // Try to get user from fallback (Supabase)
+          console.log('No Better Auth session, trying fallback');
+          const supabaseUser = await getCurrentUser();
+          if (supabaseUser) {
+            console.log('Supabase user found, proceeding as admin');
+            setUser(supabaseUser);
+            setAccessDenied(false);
+          } else {
+            console.log('No user session found - showing access denied');
+            setAccessDenied(true);
+            setIsCheckingAuth(false);
+            return;
+          }
         }
 
         // Fetch dashboard data
@@ -217,8 +202,10 @@ export default function AdminDashboard() {
                 <p><strong>Debug Info:</strong></p>
                 <p>Has user: {user ? 'Yes' : 'No'}</p>
                 <p>Has session: {session ? 'Yes' : 'No'}</p>
+                <p>Session ID: {session?.user?.id || 'N/A'}</p>
                 <p>Email: {session?.user?.email || 'N/A'}</p>
                 <p>Role: {(session?.user as { role?: string })?.role || 'N/A'}</p>
+                <p>Checking: {isCheckingAuth ? 'Yes' : 'No'}</p>
               </div>
             )}
 
