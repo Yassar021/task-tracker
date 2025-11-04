@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { signIn, useSession, getSession } from "@/lib/auth-client";
 import { signIn as supabaseSignIn, getCurrentUser } from "@/lib/client-auth";
 import { Loader2, AlertCircle, CheckCircle, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +19,7 @@ export default function SignInPage() {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const emailInputRef = useRef<HTMLInputElement>(null);
-    const { data: session, isPending } = useSession();
+    const [user, setUser] = useState<any>(null);
 
     // Redirect if already logged in
     useEffect(() => {
@@ -42,17 +41,15 @@ export default function SignInPage() {
         };
 
         checkExistingSession();
-    }, [session, isPending, router]);
+    }, [router]);
 
     // Auto-focus email input on mount
     useEffect(() => {
-        if (!isPending) {
-            emailInputRef.current?.focus();
-        }
-    }, [isPending]);
+        emailInputRef.current?.focus();
+    }, []);
 
     // Show loading while checking session
-    if (isPending) {
+    if (isLoading && user === null) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-background">
                 <div className="text-center">

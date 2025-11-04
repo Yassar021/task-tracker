@@ -16,11 +16,12 @@ export function middleware(request: NextRequest) {
   // Get all cookies to check for session
   const cookies = request.cookies.getAll();
 
-  // Check for various possible session cookie names
+  // Check for Supabase session cookies
   const sessionCookie = cookies.find(cookie =>
-    cookie.name.startsWith('better-auth') ||
+    cookie.name.startsWith('sb-') || // Supabase session
+    cookie.name.includes('auth-token') || // Custom auth token
     cookie.name === 'session' ||
-    cookie.name.includes('auth')
+    cookie.name.includes('supabase')
   );
 
   const sessionToken = sessionCookie?.value;

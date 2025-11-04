@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useSession, signOut } from "@/lib/auth-client"
+import { getCurrentUser, signOut as supabaseSignOut } from "@/lib/client-auth"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,7 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { toast } from "sonner"
-import { getCurrentUser, isAdmin, signOut as supabaseSignOut } from "@/lib/client-auth"
 import {
   Home,
   FileText,
@@ -32,10 +31,15 @@ import {
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const { data: session } = useSession()
+  const [user, setUser] = useState<any>(null)
   const { theme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Get current user on mount
+  useEffect(() => {
+    getCurrentUser().then(setUser)
+  }, [])
 
   // Handle logout
   const handleLogout = async () => {
@@ -134,16 +138,15 @@ export function SiteHeader() {
       ];
     }
 
-    // Check if user is logged in (either Better Auth or Supabase)
-    if (!session?.user?.id) {
+    // Check if user is logged in with Supabase
+    if (!user?.id) {
       return [];
     }
 
-    // Check if user is admin (either from Better Auth or Supabase)
-    const isSupabaseAdmin = session?.user?.email === "admin@ypssingkole.sch.id"
-    const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin
+    // Check if user is admin (only Supabase)
+    const isSupabaseAdmin = user?.email === "admin@ypssingkole.sch.id"
 
-    if (isAdminUser) {
+    if (isSupabaseAdmin) {
       return [
         { href: "/admin", label: "Dashboard", icon: Home },
         { href: "/admin/assignments", label: "Tugas", icon: FileText },
@@ -257,19 +260,19 @@ export function SiteHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                  {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || "U"}
+                  {user?.user_metadata?.name?.charAt(0) || user?.email?.charAt(0) || "U"}
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex items-center justify-start gap-2 p-2">
                 <div className="flex flex-col space-y-1 leading-none">
-                  {session?.user?.name && (
-                    <p className="font-medium">{session.user.name}</p>
+                  {user?.user_metadata?.name && (
+                    <p className="font-medium">{user.user_metadata.name}</p>
                   )}
-                  {session?.user?.email && (
+                  {user?.email && (
                     <p className="w-[200px] truncate text-sm text-muted-foreground">
-                      {session.user.email}
+                      {user.email}
                     </p>
                   )}
                 </div>

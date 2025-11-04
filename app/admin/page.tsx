@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Activity, School, AlertCircle, Clock, Calendar, BookOpen, Plus } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
 import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import { Footer } from "@/components/layout/footer";
 import { toast } from "sonner";
@@ -102,8 +101,7 @@ const getTimeUntilNextReset = () => {
 };
 
 export default function AdminDashboard() {
-  const { data: session } = useSession();
-  const [user, setUser] = useState<unknown>(null);
+    const [user, setUser] = useState<unknown>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [classStatus, setClassStatus] = useState<ClassStatus[]>([]);
   const [loading, setLoading] = useState(true);
@@ -127,32 +125,36 @@ export default function AdminDashboard() {
       setIsCheckingAuth(true);
 
       try {
-        // Simple admin check - if middleware allowed access, assume user is admin
-        // Trust the middleware to handle authentication
+        // Simple Supabase auth check
+        console.log('🔍 Checking Supabase auth...');
 
-        // Check if we have Better Auth session
-        if (session?.user?.id) {
-          console.log('Better Auth session found, proceeding as admin');
-          setUser(session.user);
-          setAccessDenied(false);
-        } else {
-          // Try to get user from fallback (Supabase)
-          console.log('No Better Auth session, trying fallback');
-          const supabaseUser = await getCurrentUser();
-          if (supabaseUser) {
-            console.log('Supabase user found, proceeding as admin');
-            setUser(supabaseUser);
+        const currentUser = await getCurrentUser();
+        console.log('🔍 Current User Result:', { currentUser });
+
+        if (currentUser) {
+          // Check if user is admin
+          const adminCheck = await isAdmin();
+          console.log('🔑 Admin Check Result:', { adminCheck, email: currentUser.email });
+
+          if (adminCheck) {
+            console.log('✅ Admin access confirmed');
+            setUser(currentUser);
             setAccessDenied(false);
+
+            // Fetch dashboard data
+            fetchDashboardData();
           } else {
-            console.log('No user session found - showing access denied');
+            console.log('❌ Not an admin user');
             setAccessDenied(true);
             setIsCheckingAuth(false);
             return;
           }
+        } else {
+          console.log('❌ No user session found');
+          setAccessDenied(true);
+          setIsCheckingAuth(false);
+          return;
         }
-
-        // Fetch dashboard data
-        fetchDashboardData();
 
       } catch (error) {
         console.error('Authentication check failed:', error);
@@ -165,7 +167,7 @@ export default function AdminDashboard() {
     };
 
     checkAuthentication();
-  }, [session]); // Re-run when session changes
+  }, []); // Run once on mount
 
   const fetchDashboardData = async () => {
     try {
@@ -201,10 +203,9 @@ export default function AdminDashboard() {
               <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs text-left">
                 <p><strong>Debug Info:</strong></p>
                 <p>Has user: {user ? 'Yes' : 'No'}</p>
-                <p>Has session: {session ? 'Yes' : 'No'}</p>
-                <p>Session ID: {session?.user?.id || 'N/A'}</p>
-                <p>Email: {session?.user?.email || 'N/A'}</p>
-                <p>Role: {(session?.user as { role?: string })?.role || 'N/A'}</p>
+                <p>User ID: {user?.id || 'N/A'}</p>
+                <p>Email: {user?.email || 'N/A'}</p>
+                <p>Name: {user?.user_metadata?.name || 'N/A'}</p>
                 <p>Checking: {isCheckingAuth ? 'Yes' : 'No'}</p>
               </div>
             )}
