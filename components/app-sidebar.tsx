@@ -17,7 +17,6 @@ import {
   IconUser,
 } from "@tabler/icons-react"
 
-import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -28,9 +27,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
+  } from "@/components/ui/sidebar"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = useSession()
@@ -131,7 +128,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   };
 
   const userData = (session?.user || currentUser) ? {
-    name: session?.user?.name || (currentUser as any)?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as any)?.email?.split('@')[0] || "Admin",
+    name: session?.user?.name || (currentUser as { user_metadata?: { name?: string } })?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as { email?: string })?.email?.split('@')[0] || "Admin",
     email: session?.user?.email || currentUser?.email || "admin@ypssingkole.sch.id",
     avatar: session?.user?.image || "/codeguide-logo.png",
   } : {
