@@ -34,10 +34,21 @@ export async function signOut() {
 export async function getCurrentUser() {
   try {
     const supabase = createClient();
+
+    // Debug: Check session first
+    const { data: sessionData } = await supabase.auth.getSession();
+    console.log('🔍 Current Session:', sessionData.session ? 'Found' : 'Not found');
+
     const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) throw error;
+    if (error) {
+      console.log('❌ Get user error:', error.message);
+      throw error;
+    }
+
+    console.log('🔍 Current User Result:', user || 'No user');
     return user;
   } catch (error) {
+    console.log('❌ No user session found');
     return null;
   }
 }

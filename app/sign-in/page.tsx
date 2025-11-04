@@ -113,10 +113,24 @@ export default function SignInPage() {
                     icon: <CheckCircle className="h-4 w-4" />,
                 });
 
-                // Wait a moment for session to be established, then redirect to admin
-                setTimeout(() => {
-                    router.push("/admin");
-                }, 1000);
+                // Wait for session to be established and verify before redirect
+                setTimeout(async () => {
+                    // Verify session is actually established
+                    const { getCurrentUser } = await import("@/lib/client-auth");
+                    const currentUser = await getCurrentUser();
+
+                    if (currentUser) {
+                        console.log('✅ Session verified, redirecting to admin');
+                        router.push("/admin");
+                        router.refresh(); // Force refresh to update server components
+                    } else {
+                        console.log('❌ Session not established after login');
+                        toast.error("Sesi gagal dibuat", {
+                            description: "Silakan coba login kembali",
+                            icon: <AlertCircle className="h-4 w-4" />,
+                        });
+                    }
+                }, 1500);
             } else {
                 toast.error("Login gagal", {
                     description: result.error || "Terjadi kesalahan saat masuk",

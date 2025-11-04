@@ -16,15 +16,25 @@ export function middleware(request: NextRequest) {
   // Get all cookies to check for session
   const cookies = request.cookies.getAll();
 
-  // Check for Supabase session cookies
-  const sessionCookie = cookies.find(cookie =>
-    cookie.name.startsWith('sb-') || // Supabase session
-    cookie.name.includes('auth-token') || // Custom auth token
-    cookie.name === 'session' ||
-    cookie.name.includes('supabase')
+  // Log all cookies for debugging (remove in production)
+  if (pathname.startsWith('/admin')) {
+    console.log('All cookies:', cookies.map(c => ({ name: c.name, value: c.value?.substring(0, 20) + '...' })));
+  }
+
+  // Check for Supabase session cookies - be more specific
+  const supabaseCookies = cookies.filter(cookie =>
+    cookie.name.startsWith('sb-') &&
+    (cookie.name.includes('-auth-token') || cookie.name.includes('-access-token'))
   );
 
-  const sessionToken = sessionCookie?.value;
+  const hasSupabaseSession = supabaseCookies.length > 0;
+
+  console.log('Supabase session check:', {
+    pathname,
+    hasSupabaseSession,
+    cookieCount: cookies.length,
+    supabaseCookieNames: supabaseCookies.map(c => c.name)
+  });
 
   // Skip middleware for static assets and API routes
   if (
@@ -37,16 +47,16 @@ export function middleware(request: NextRequest) {
   }
 
   // If trying to access protected routes without session, redirect to sign-in
-  if (isProtectedPath && !sessionToken) {
-    console.log('No session found for protected path, redirecting to sign-in');
+  if (isProtectedPath && !hasSupabaseSession) {
+    console.log('No Supabase session found for protected path, redirecting to sign-in');
     return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
   // If authenticated user tries to access sign-in page, redirect to home page instead of admin
   // This prevents infinite loop
-  if (isAuthPath && sessionToken) {
-    console.log('Session found, redirecting to home page');
-    return NextResponse.redirect(new URL('/', request.url));
+  if (isAuthPath && hasSupabaseSession) {
+    console.log('Supabase session found, redirecting to admin page');
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   return NextResponse.next()
