@@ -129,7 +129,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const userData = (session?.user || currentUser) ? {
     name: session?.user?.name || (currentUser as { user_metadata?: { name?: string } })?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as { email?: string })?.email?.split('@')[0] || "Admin",
-    email: session?.user?.email || currentUser?.email || "admin@ypssingkole.sch.id",
+    email: session?.user?.email || (currentUser as { email?: string })?.email || "admin@ypssingkole.sch.id",
     avatar: session?.user?.image || "/codeguide-logo.png",
   } : {
     name: "Guest",
@@ -162,8 +162,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="px-3 py-2">
             <div className="mb-2">
               <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {(!session?.user?.role && !currentUser) ? 'Menu' :
-                 (session?.user?.role === 'admin' || isSupabaseAdmin) ? 'Admin Panel' : 'Dashboard'}
+                {(!(session?.user as { role?: string })?.role && !currentUser) ? 'Menu' :
+                 ((session?.user as { role?: string })?.role === 'admin' || isSupabaseAdmin) ? 'Admin Panel' : 'Dashboard'}
               </p>
             </div>
             <SidebarMenu>
@@ -196,7 +196,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-                {(session?.user?.role === 'admin' || isSupabaseAdmin) && (
+                {((session?.user as { role?: string })?.role === 'admin' || isSupabaseAdmin) && (
                   <SidebarMenuItem>
                     <SidebarMenuButton onClick={() => signOut().then(() => window.location.href = '/sign-in')}>
                       <IconLogout className="h-4 w-4" />

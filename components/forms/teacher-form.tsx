@@ -72,7 +72,8 @@ export function TeacherForm({ teacher, isOpen, onClose, onSuccess }: TeacherForm
     reset,
     formState: { errors },
   } = useForm<TeacherFormData>({
-    resolver: zodResolver(teacherFormSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(teacherFormSchema) as any,
     defaultValues: {
       name: teacher?.name || "",
       email: teacher?.email || "",
@@ -318,7 +319,8 @@ export function TeacherForm({ teacher, isOpen, onClose, onSuccess }: TeacherForm
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => addLearningGoalTemplate(template, selectedSubjects[0], learningGoals, setLearningGoals, setValue)}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onClick={() => addLearningGoalTemplate(template, selectedSubjects[0], learningGoals, setLearningGoals, setValue as any)}
                     >
                       + {template.replace("{subject}", selectedSubjects[0])}
                     </Button>

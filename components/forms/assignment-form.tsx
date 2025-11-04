@@ -270,7 +270,8 @@ export function AssignmentForm({
 
   const getClassQuotaStatus = (classId: string) => {
     // Get current class status from props
-    const classStatus = currentClassStatuses.find(cs => cs.class.id === classId);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const classStatus = currentClassStatuses.find(cs => (cs as any).class?.id === classId);
     const assignmentType = watch('type');
 
     if (!classStatus) {
@@ -360,7 +361,7 @@ export function AssignmentForm({
       console.error("Error creating assignment:", error);
 
       // Handle specific error messages
-      const errorMessage = error.message;
+      const errorMessage = error instanceof Error ? error.message : String(error);
       if (errorMessage.includes('database') || errorMessage.includes('Database')) {
         toast.error("Gagal terhubung ke database. Silakan coba lagi atau hubungi admin.");
       } else if (errorMessage.includes('timeout')) {
@@ -520,7 +521,8 @@ export function AssignmentForm({
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => addLearningGoalTemplate(template, selectedSubject, setValue)}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      onClick={() => addLearningGoalTemplate(template, selectedSubject, setValue as any)}
                     >
                       Gunakan Template
                     </Button>

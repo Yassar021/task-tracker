@@ -179,8 +179,8 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
         learningGoal: data.learningGoal,
         type: "UJIAN",
         examType: data.examType,
-        weekNumber: currentWeekInfo.weekNumber,
-        year: currentWeekInfo.year,
+        weekNumber: currentWeekInfo?.weekNumber || 1,
+        year: currentWeekInfo?.year || new Date().getFullYear(),
         teacherId,
         examDate: data.examDate,
         status: "published" as const,
@@ -323,7 +323,7 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
                 <Calendar
                   mode="single"
                   selected={examDate}
-                  onSelect={(date) => form.setValue("examDate", date)}
+                  onSelect={(date) => date && form.setValue("examDate", date)}
                   disabled={(date) => date < new Date()}
                   initialFocus
                 />
@@ -361,7 +361,8 @@ export function ExamForm({ isOpen, onClose, onSuccess, teacherId }: ExamFormProp
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => addLearningGoalTemplate(template, selectedSubject, form.setValue)}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    onClick={() => addLearningGoalTemplate(template, selectedSubject, form.setValue as any)}
                   >
                     Gunakan Template
                   </Button>

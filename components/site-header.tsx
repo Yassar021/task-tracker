@@ -128,7 +128,7 @@ export function SiteHeader() {
     }
 
     // Check if user is admin (either from Better Auth or Supabase)
-    const isAdminUser = session?.user?.role === "admin" || isSupabaseAdmin;
+    const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin;
 
     if (isAdminUser) {
       return [
@@ -146,11 +146,12 @@ export function SiteHeader() {
     ];
   }
 
-  const pageInfo = getPageInfo()
+  const pageInfo = getPageInfo() as { title: string; description: string; gradient: string }
   const navigationItems = getNavigationItems()
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Top Bar */}
       <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
         {/* Modern Logo & Title */}
@@ -264,5 +265,6 @@ export function SiteHeader() {
         </div>
       )}
     </header>
+    </>
   )
 }
