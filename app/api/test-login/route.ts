@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { signIn } from '@/lib/client-auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,12 +7,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🔐 Testing login with:', { email, password: '***' });
 
-    const result = await auth.api.signInEmail({
-      body: {
-        email,
-        password,
-      },
-    });
+    const result = await signIn(email, password);
 
     console.log('🔍 Auth result:', {
       success: true,

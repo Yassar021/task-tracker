@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import { createClass, getAllClasses } from "@/lib/data-access";
 import { generateAllClasses } from "@/lib/school-utils";
 import { createAuditLog } from "@/lib/data-access";
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -39,7 +37,7 @@ export async function POST(request: NextRequest) {
     // Create audit log
     await createAuditLog({
       id: crypto.randomUUID(),
-      userId: session.user.id,
+      userId: user.id,
       action: "INITIALIZE_CLASSES",
       entityType: "class",
       entityId: "system",

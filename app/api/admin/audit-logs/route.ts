@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getCurrentUser, isAdmin } from '@/lib/client-auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user?.id || (session.user as { role?: string }).role !== 'admin') {
+    if (!user || !await isAdmin()) {
       return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
     }
 

@@ -19,17 +19,12 @@ export default function SignInPage() {
     const [showPassword, setShowPassword] = useState(false);
     const router = useRouter();
     const emailInputRef = useRef<HTMLInputElement>(null);
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<any | null>(null);
 
     // Redirect if already logged in
     useEffect(() => {
         const checkExistingSession = async () => {
-            if (!isPending && session?.user) {
-                router.replace("/admin");
-                return;
-            }
-
-            // Also check Supabase session if Better Auth session doesn't exist
+            // Check Supabase session
             try {
                 const user = await getCurrentUser();
                 if (user) {

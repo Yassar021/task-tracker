@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import {
   getTeacherById,
   updateTeacher,
@@ -26,13 +26,11 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -65,13 +63,11 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -114,7 +110,7 @@ export async function PUT(
     // Create audit log
     await createAuditLog({
       id: crypto.randomUUID(),
-      userId: session.user.id,
+      userId: user.id,
       action: "UPDATE_TEACHER",
       entityType: "teacher",
       entityId: id,
@@ -157,13 +153,11 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -185,7 +179,7 @@ export async function DELETE(
     // Create audit log
     await createAuditLog({
       id: crypto.randomUUID(),
-      userId: session.user.id,
+      userId: user.id,
       action: "DELETE_TEACHER",
       entityType: "teacher",
       entityId: id,

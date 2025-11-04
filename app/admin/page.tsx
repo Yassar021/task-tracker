@@ -101,7 +101,7 @@ const getTimeUntilNextReset = () => {
 };
 
 export default function AdminDashboard() {
-    const [user, setUser] = useState<unknown>(null);
+    const [user, setUser] = useState<any | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [classStatus, setClassStatus] = useState<ClassStatus[]>([]);
   const [loading, setLoading] = useState(true);

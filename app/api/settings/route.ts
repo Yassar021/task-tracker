@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSetting, updateSetting } from '@/lib/data-access';
+import { getCurrentUser, isAdmin } from '@/lib/client-auth';
 
 interface SystemSettings {
   maxWeeklyTasks: number;
@@ -31,12 +32,10 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user?.id || (session.user as { role?: string }).role !== 'admin') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user || !await isAdmin()) {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -57,8 +56,8 @@ export async function PUT(request: NextRequest) {
     }
 
     await Promise.all([
-      updateSetting('max_weekly_assignments', maxWeeklyTasks.toString(), session.user.id),
-      updateSetting('max_weekly_exams', maxWeeklyExams.toString(), session.user.id),
+      updateSetting('max_weekly_assignments', maxWeeklyTasks.toString(), user.id),
+      updateSetting('max_weekly_exams', maxWeeklyExams.toString(), user.id),
     ]);
 
     const settings: SystemSettings = {

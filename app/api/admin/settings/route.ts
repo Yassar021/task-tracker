@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/client-auth";
 import { z } from "zod";
 
 // Sample settings data
@@ -38,13 +38,11 @@ const updateSettingSchema = z.object({
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }
@@ -63,13 +61,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: request.headers,
-    });
+    const user = await getCurrentUser();
 
-    if (!session?.user || (session.user as { role?: string }).role !== "admin") {
+    if (!user || !await isAdmin()) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "Unauthorized - Admin access required" },
         { status: 401 }
       );
     }

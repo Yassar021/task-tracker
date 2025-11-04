@@ -4,7 +4,7 @@ import React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { getCurrentUser, signOut as supabaseSignOut } from "@/lib/client-auth"
+import { getCurrentUser, signOut as supabaseSignOut, signOut } from "@/lib/client-auth"
 import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import {
@@ -31,7 +31,7 @@ import {
 
 export function SiteHeader() {
   const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<any | null>(null)
   const { theme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)

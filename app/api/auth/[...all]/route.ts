@@ -1,4 +1,10 @@
-import { auth } from "@/lib/auth"; // path to your auth file
-import { toNextJsHandler } from "better-auth/next-js";
+import { NextResponse } from "next/server";
 
-export const { POST, GET } = toNextJsHandler(auth);
+// Better Auth routes are disabled - using Supabase auth instead
+export async function GET() {
+  return NextResponse.json({ message: "Auth endpoints migrated to Supabase" }, { status: 410 });
+}
+
+export async function POST() {
+  return NextResponse.json({ message: "Auth endpoints migrated to Supabase" }, { status: 410 });
+}
