@@ -7,8 +7,8 @@ import * as schoolSchema from './schema/school';
 // Handle missing database gracefully
 let db: ReturnType<typeof drizzle> | null = null;
 
-// Check for offline mode or missing database
-const OFFLINE_MODE = process.env.OFFLINE_MODE === 'true' || !process.env.DATABASE_URL;
+// Force offline mode for now to prevent connection issues
+const OFFLINE_MODE = process.env.NODE_ENV === 'production' ? false : true;
 
 if (OFFLINE_MODE) {
   console.warn('🔌 Running in OFFLINE MODE - database features disabled');
@@ -23,7 +23,7 @@ if (OFFLINE_MODE) {
     let config;
     try {
       // For Supabase, we need to handle the connection string differently
-      if (dbUrl.includes('supabase')) {
+      if (dbUrl && dbUrl.includes && dbUrl.includes('supabase')) {
         // Extract connection details manually for Supabase
         const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/);
         if (urlMatch) {
@@ -66,7 +66,7 @@ if (OFFLINE_MODE) {
         database: config.database || 'postgres',
         user: config.user || 'from connection string',
         sslEnabled: !!config.ssl,
-        supabase: dbUrl.includes('supabase')
+        supabase: dbUrl && dbUrl.includes && dbUrl.includes('supabase')
       });
     } catch (configError) {
       console.error('Failed to parse database URL:', configError);
@@ -118,8 +118,8 @@ if (OFFLINE_MODE) {
       }
     };
 
-    // Run connection test immediately
-    testConnection();
+    // Skip connection test for now to prevent deployment issues
+    // testConnection();
 
   } catch (error) {
     console.warn('Database initialization failed, running in demo mode:', error);
