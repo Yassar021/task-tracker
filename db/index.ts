@@ -23,10 +23,12 @@ if (OFFLINE_MODE) {
     let config;
     try {
       // For Supabase, we need to handle the connection string differently
-      if (dbUrl && dbUrl.includes && dbUrl.includes('supabase')) {
+      if (dbUrl && dbUrl.includes && (dbUrl.includes('supabase') || dbUrl.includes('aws-'))) {
         // Extract connection details manually for Supabase
         console.log('Parsing URL:', dbUrl.substring(0, 50) + '...');
-        const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):(\d+)\/([^?&]+)/);
+        // Try multiple URL patterns for different Supabase connection types
+        const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):(\d+)\/([^?&]+)/) ||
+                       dbUrl.match(/postgres:\/\/([^:]+):([^@]+)@([^:\/]+):(\d+)\/([^?&]+)/);
         if (urlMatch) {
           config = {
             host: urlMatch[3],
