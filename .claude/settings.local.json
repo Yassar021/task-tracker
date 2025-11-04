@@ -26,7 +26,8 @@
       "Bash(DATABASE_URL=postgresql://postgres:xWFFUObx2XlW25b4@db.klfuyvwfgyzaaattsjxc.supabase.co:5432/postgres?sslmode=require)",
       "Bash(echo:*)",
       "WebFetch(domain:task-tracker-yps.vercel.app)",
-      "Bash(openssl:*)"
+      "Bash(openssl:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
