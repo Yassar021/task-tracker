@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSetting, updateSetting } from '@/lib/data-access';
-import { auth } from '@/lib/auth';
 
 interface SystemSettings {
   maxWeeklyTasks: number;
