@@ -11,7 +11,7 @@ import type {
 // User Management
 export async function getUserByEmail(email: string) {
   return await safeDbOperation(
-    () => db.query.users.findFirst({
+    () => (db as any).query.users.findFirst({
       where: eq(users.email, email),
       with: {
         teacher: true,

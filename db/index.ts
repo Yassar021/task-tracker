@@ -35,7 +35,7 @@ if (OFFLINE_MODE) {
             password: urlMatch[2],
             ssl: {
               rejectUnauthorized: false,
-              sslmode: 'require'
+              // sslmode: 'require' // Not supported in PoolConfig
             },
             connectionTimeoutMillis: 20000, // 20 seconds for Supabase
             idleTimeoutMillis: 30000, // 30 seconds
@@ -103,13 +103,13 @@ if (OFFLINE_MODE) {
         ]);
 
         await Promise.race([
-          client.query('SELECT NOW()'),
+          (client as any).query('SELECT NOW()'),
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Query test timeout')), 3000)
           )
         ]);
 
-        client.release();
+        (client as any).release();
         console.log('✅ Database connection test successful');
       } catch (error) {
         console.warn('❌ Database connection test failed:', error instanceof Error ? error.message : "Unknown error");
