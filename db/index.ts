@@ -25,7 +25,8 @@ if (OFFLINE_MODE) {
       // For Supabase, we need to handle the connection string differently
       if (dbUrl && dbUrl.includes && dbUrl.includes('supabase')) {
         // Extract connection details manually for Supabase
-        const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/([^?]+)/);
+        console.log('Parsing URL:', dbUrl.substring(0, 50) + '...');
+        const urlMatch = dbUrl.match(/postgresql:\/\/([^:]+):([^@]+)@([^:\/]+):(\d+)\/([^?&]+)/);
         if (urlMatch) {
           config = {
             host: urlMatch[3],
