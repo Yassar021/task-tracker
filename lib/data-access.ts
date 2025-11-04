@@ -11,6 +11,7 @@ import type {
 // User Management
 export async function getUserByEmail(email: string) {
   return await safeDbOperation(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     () => (db as any).query.users.findFirst({
       where: eq(users.email, email),
       with: {
@@ -22,7 +23,7 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function getUserById(id: string) {
-  return await db.query.users.findFirst({
+  return await (db as any).query.users.findFirst({
     where: eq(users.id, id),
     with: {
       teacher: true,
@@ -31,12 +32,12 @@ export async function getUserById(id: string) {
 }
 
 export async function createUserRole(data: NewUser) {
-  return await db.insert(users).values(data).returning();
+  return await (db as any).insert(users).values(data).returning();
 }
 
 // Teacher Management
 export async function getAllTeachers() {
-  return await db.query.teachers.findMany({
+  return await (db as any).query.teachers.findMany({
     with: {
       user: true,
       assignments: {
@@ -48,7 +49,7 @@ export async function getAllTeachers() {
 }
 
 export async function getTeacherById(id: string) {
-  return await db.query.teachers.findFirst({
+  return await (db as any).query.teachers.findFirst({
     where: eq(teachers.id, id),
     with: {
       user: true,
@@ -67,20 +68,20 @@ export async function getTeacherById(id: string) {
 }
 
 export async function createTeacher(data: NewTeacher) {
-  return await db.insert(teachers).values(data).returning();
+  return await (db as any).insert(teachers).values(data).returning();
 }
 
 export async function updateTeacher(id: string, data: Partial<NewTeacher>) {
-  return await db.update(teachers).set({ ...data, updatedAt: new Date() }).where(eq(teachers.id, id)).returning();
+  return await (db as any).update(teachers).set({ ...data, updatedAt: new Date() }).where(eq(teachers.id, id)).returning();
 }
 
 export async function deleteTeacher(id: string) {
-  return await db.update(teachers).set({ isActive: false, updatedAt: new Date() }).where(eq(teachers.id, id));
+  return await (db as any).update(teachers).set({ isActive: false, updatedAt: new Date() }).where(eq(teachers.id, id));
 }
 
 // Class Management
 export async function getAllClasses() {
-  return await db.query.classes.findMany({
+  return await (db as any).query.classes.findMany({
     with: {
       homeroomTeacher: true,
       classAssignments: {
@@ -95,23 +96,23 @@ export async function getAllClasses() {
 }
 
 export async function getClassesByGrade(grade: number) {
-  return await db.query.classes.findMany({
+  return await (db as any).query.classes.findMany({
     where: and(eq(classes.grade, grade), eq(classes.isActive, true)),
     orderBy: [classes.name],
   });
 }
 
 export async function createClass(data: NewClass) {
-  return await db.insert(classes).values(data).returning();
+  return await (db as any).insert(classes).values(data).returning();
 }
 
 export async function updateClass(id: string, data: Partial<NewClass>) {
-  return await db.update(classes).set({ ...data, updatedAt: new Date() }).where(eq(classes.id, id)).returning();
+  return await (db as any).update(classes).set({ ...data, updatedAt: new Date() }).where(eq(classes.id, id)).returning();
 }
 
 // Assignment Management
 export async function getAssignmentsByTeacher(teacherId: string) {
-  return await db.query.assignments.findMany({
+  return await (db as any).query.assignments.findMany({
     where: eq(assignments.teacherId, teacherId),
     with: {
       teacher: true,
@@ -135,7 +136,7 @@ export async function getAssignmentsByClass(classId: string, weekNumber?: number
       )]
     : [];
 
-  return await db.query.classAssignments.findMany({
+  return await (db as any).query.classAssignments.findMany({
     where: and(...baseConditions, ...additionalConditions),
     with: {
       assignment: {
@@ -150,7 +151,7 @@ export async function getAssignmentsByClass(classId: string, weekNumber?: number
 }
 
 export async function createAssignment(data: NewAssignment) {
-  return await db.insert(assignments).values(data).returning();
+  return await (db as any).insert(assignments).values(data).returning();
 }
 
 export async function assignToClasses(assignmentId: string, classIds: string[]) {
@@ -161,7 +162,7 @@ export async function assignToClasses(assignmentId: string, classIds: string[]) 
     assignedDate: new Date(),
   }));
 
-  return await db.insert(classAssignments).values(assignments).returning();
+  return await (db as any).insert(classAssignments).values(assignments).returning();
 }
 
 export async function getWeeklyAssignmentCount(teacherId: string, weekNumber: number, year: number, classId: string) {
@@ -183,13 +184,13 @@ export async function getWeeklyAssignmentCount(teacherId: string, weekNumber: nu
 
 // Settings Management
 export async function getSetting(key: string) {
-  return await db.query.settings.findFirst({
+  return await (db as any).query.settings.findFirst({
     where: eq(settings.key, key),
   });
 }
 
 export async function getAllSettings() {
-  return await db.query.settings.findMany();
+  return await (db as any).query.settings.findMany();
 }
 
 export async function updateSetting(key: string, value: string, updatedBy: string) {
@@ -201,16 +202,16 @@ export async function updateSetting(key: string, value: string, updatedBy: strin
 }
 
 export async function createSetting(data: NewSetting) {
-  return await db.insert(settings).values(data).returning();
+  return await (db as any).insert(settings).values(data).returning();
 }
 
 // Audit Log
 export async function createAuditLog(data: NewAuditLog) {
-  return await db.insert(auditLogs).values(data).returning();
+  return await (db as any).insert(auditLogs).values(data).returning();
 }
 
 export async function getAuditLogs(limit: number = 100) {
-  return await db.query.auditLogs.findMany({
+  return await (db as any).query.auditLogs.findMany({
     with: {
       user: {
         with: {
@@ -240,9 +241,9 @@ export async function getTeacherStats(teacherId: string) {
 
 export async function getSchoolStats() {
   const [totalTeachers, totalClasses, totalAssignments] = await Promise.all([
-    db.select({ count: count() }).from(teachers).where(eq(teachers.isActive, true)),
-    db.select({ count: count() }).from(classes).where(eq(classes.isActive, true)),
-    db.select({ count: count() }).from(assignments),
+    (db as any).select({ count: count() }).from(teachers).where(eq(teachers.isActive, true)),
+    (db as any).select({ count: count() }).from(classes).where(eq(classes.isActive, true)),
+    (db as any).select({ count: count() }).from(assignments),
   ]);
 
   return {
