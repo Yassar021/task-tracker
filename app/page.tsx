@@ -15,6 +15,7 @@ import {
   Users,
   Lock,
   Eye,
+  EyeOff,
   RefreshCw,
 } from "lucide-react";
 import { AssignmentForm } from "@/components/forms/assignment-form";
@@ -73,6 +74,7 @@ export default function HomePage() {
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<string>('');
   const [inputCode, setInputCode] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [currentWeek, setCurrentWeek] = useState<{ weekNumber: number; year: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -264,6 +266,7 @@ export default function HomePage() {
     setShowAssignmentForm(true);
     setSelectedGrade('');
     setInputCode('');
+    setShowPassword(false); // Reset password visibility
   };
 
   // Group classes by grade
@@ -487,13 +490,26 @@ export default function HomePage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Kode Rahasia:</label>
-                <input
-                  type="password"
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value)}
-                  placeholder="Masukkan kode"
-                  className="w-full p-3 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={inputCode}
+                    onChange={(e) => setInputCode(e.target.value)}
+                    placeholder="Masukkan kode"
+                    className="w-full p-3 pr-10 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div className="flex gap-2 sm:gap-3">
@@ -503,6 +519,7 @@ export default function HomePage() {
                     setShowInputForm(false);
                     setSelectedGrade('');
                     setInputCode('');
+                    setShowPassword(false);
                   }}
                   className="flex-1 text-sm"
                 >
