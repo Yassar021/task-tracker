@@ -1,26 +1,12 @@
 "use client"
 
 import React from "react"
-import { Button } from "@/components/ui/button"
-import { usePathname } from "next/navigation"
-import { useSession } from "@/lib/auth-client"
-import { getCurrentUser, isAdmin, signOut as supabaseSignOut } from "@/lib/client-auth"
 import { useState } from "react"
-import { toast } from "sonner"
-import {
-  Bell,
-  Search,
-  User,
-  LogOut,
-  Sun,
-  Moon,
-  Home,
-  BookOpen,
-  Calendar,
-  BarChart3,
-  FileText
-} from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { useSession, signOut } from "@/lib/auth-client"
 import { useTheme } from "next-themes"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,66 +14,71 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "sonner"
+import { getCurrentUser, isAdmin, signOut as supabaseSignOut } from "@/lib/client-auth"
+import {
+  Home,
+  FileText,
+  BarChart3,
+  BookOpen,
+  Settings,
+  LogOut,
+  User,
+  Moon,
+  Sun,
+  Menu,
+  X,
+  Bell,
+  Search,
+  Plus,
+  UserPlus
+} from "lucide-react"
 
 export function SiteHeader() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const { theme, setTheme } = useTheme()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const [isSupabaseAdmin, setIsSupabaseAdmin] = useState(false)
-  const [currentUser, setCurrentUser] = useState<unknown>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Check Supabase session and admin status
-  React.useEffect(() => {
-    const checkSupabaseAuth = async () => {
-      try {
-        const user = await getCurrentUser()
-        const adminStatus = await isAdmin()
-        setCurrentUser(user)
-        setIsSupabaseAdmin(adminStatus)
-      } catch (error) {
-        console.error('Error checking Supabase auth:', error)
-      }
-    }
-
-    checkSupabaseAuth()
-  }, [])
-
+  // Handle logout
   const handleLogout = async () => {
-    if (isLoggingOut) return // Prevent multiple clicks
-
     setIsLoggingOut(true)
-
     try {
-      console.log('Attempting logout...')
-
-      // Try Supabase logout first
-      await supabaseSignOut()
-
-      console.log('Logout successful, redirecting to homepage...')
-      toast.success('Berhasil keluar dari sistem')
-
-      // Redirect to homepage after successful logout
-      window.location.href = "/"
-
+      // Logout from Better Auth
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            // Also logout from Supabase
+            supabaseSignOut()
+            toast.success("Berhasil keluar", {
+              description: "Anda telah keluar dari sistem",
+            })
+            window.location.href = "/"
+          },
+          onError: (ctx) => {
+            toast.error("Gagal keluar", {
+              description: ctx.error.message || "Terjadi kesalahan saat keluar",
+            })
+          },
+        },
+      })
     } catch (error) {
       console.error("Logout error:", error)
-      toast.error('Terjadi kesalahan saat logout, mengalihkan ke homepage...')
-
-      // Fallback: force redirect to homepage even if logout fails
-      setTimeout(() => {
-        window.location.href = "/"
-      }, 1000)
+      toast.error("Gagal keluar", {
+        description: "Terjadi kesalahan saat keluar",
+      })
     } finally {
       setIsLoggingOut(false)
     }
   }
 
+  // Get page info based on current path
   const getPageInfo = () => {
     if (pathname.includes('/admin')) return {
-      title: "Dashboard Admin",
-      description: "Kelola sistem sekolah",
-      gradient: "from-red-500 to-pink-500"
+      title: "Admin Panel",
+      description: "Kelola sistem akademik",
+      gradient: "from-blue-600 to-purple-600"
     }
     if (pathname.includes('/dashboard')) return {
       title: "Dashboard Guru",
@@ -123,37 +114,49 @@ export function SiteHeader() {
 
   const getNavigationItems = () => {
     // Check if user is logged in (either Better Auth or Supabase)
-    if (!session?.user?.id && !currentUser) {
+    if (!session?.user?.id) {
       return [];
     }
 
     // Check if user is admin (either from Better Auth or Supabase)
-    const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin;
+    const isSupabaseAdmin = session?.user?.email === "admin@ypssingkole.sch.id"
+    const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin
 
     if (isAdminUser) {
       return [
         { href: "/admin", label: "Dashboard", icon: Home },
         { href: "/admin/assignments", label: "Tugas", icon: FileText },
         { href: "/admin/analytics", label: "Statistik", icon: BarChart3 },
-      ];
+        { href: "/admin/classes", label: "Kelas", icon: BookOpen },
+        { href: "/admin/settings", label: "Pengaturan", icon: Settings },
+      ]
     }
 
-    return [
+    // Teacher navigation
+    if (pathname.includes('/dashboard')) return [
       { href: "/dashboard", label: "Dashboard", icon: Home },
-      { href: "/assignments", label: "Tugas", icon: BookOpen },
-      { href: "/exams", label: "Ujian", icon: Calendar },
+      { href: "/dashboard/assignments", label: "Tugas", icon: FileText },
+      { href: "/dashboard/exams", label: "Ujian", icon: BarChart3 },
+      { href: "/dashboard/classes", label: "Kelas", icon: BookOpen },
+      { href: "/dashboard/settings", label: "Pengaturan", icon: Settings },
+    ]
+
+    // Student navigation
+    return [
+      { href: "/", label: "Beranda", icon: Home },
+      { href: "/assignments", label: "Tugas", icon: FileText },
+      { href: "/exams", label: "Ujian", icon: BarChart3 },
       { href: "/classes", label: "Kelas", icon: BookOpen },
-    ];
+    ]
   }
 
   const pageInfo = getPageInfo() as { title: string; description: string; gradient: string }
   const navigationItems = getNavigationItems()
 
   return (
-    <>
-      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        {/* Top Bar */}
-        <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
+    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Top Bar */}
+      <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
         {/* Modern Logo & Title */}
         <div className="flex items-center gap-3 flex-1">
           <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${pageInfo.gradient} text-white shadow-lg`}>
@@ -168,23 +171,27 @@ export function SiteHeader() {
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
           {/* Search Button */}
-          <Button variant="ghost" size="sm" className="hidden sm:flex">
+          <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
             <Search className="h-4 w-4" />
-            <span className="sr-only">Search</span>
+            <span>Cari...</span>
           </Button>
 
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-red-500"></span>
-            <span className="sr-only">Notifications</span>
+            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
+          </Button>
+
+          {/* Add New Button */}
+          <Button variant="ghost" size="sm">
+            <Plus className="h-4 w-4" />
           </Button>
 
           {/* Theme Toggle */}
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -195,76 +202,96 @@ export function SiteHeader() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                  <User className="h-4 w-4" />
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
+                  {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || "U"}
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <div className="flex items-center justify-start gap-2 p-2">
                 <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-medium">
-                    {session?.user?.name || currentUser?.user_metadata?.name || session?.user?.email?.split('@')[0] || currentUser?.email?.split('@')[0] || 'Admin'}
-                  </p>
-                  <p className="w-[200px] truncate text-sm text-muted-foreground">
-                    {session?.user?.email || currentUser?.email || 'admin@ypssingkole.sch.id'}
-                  </p>
-                  <p className="text-xs text-muted-foreground capitalize">
-                    {((session?.user?.role === "admin" || isSupabaseAdmin) ? 'Admin' : (session?.user?.role || 'User'))}
-                  </p>
+                  {session?.user?.name && (
+                    <p className="font-medium">{session.user.name}</p>
+                  )}
+                  {session?.user?.email && (
+                    <p className="w-[200px] truncate text-sm text-muted-foreground">
+                      {session.user.email}
+                    </p>
+                  )}
                 </div>
               </div>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings" className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Pengaturan
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem
+                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
                 onClick={handleLogout}
-                className="text-red-600 cursor-pointer"
                 disabled={isLoggingOut}
               >
                 {isLoggingOut ? (
                   <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-red-600 border-t-transparent" />
-                    <span>Sedang keluar...</span>
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Keluar...
                   </>
                 ) : (
                   <>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Keluar</span>
+                    <LogOut className="h-4 w-4" />
+                    Keluar
                   </>
                 )}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Mobile Menu Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </Button>
         </div>
       </div>
 
-      {/* Navigation Bar */}
-      {(session?.user || currentUser) && (
-        <div className="border-t border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex items-center justify-center gap-1 px-4 lg:px-6 h-14">
-            <div className="flex items-center gap-1">
-              {navigationItems.map((item) => {
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-                return (
-                  <Button
-                    key={item.href}
-                    variant={isActive ? "secondary" : "ghost"}
-                    size="sm"
-                    asChild
-                    className={`h-8 gap-2 px-4 ${isActive ? "bg-primary/10 text-primary border-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
-                  >
-                    <a href={item.href}>
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline font-medium">{item.label}</span>
-                    </a>
-                  </Button>
-                );
-              })}
-            </div>
+      {/* Mobile Navigation */}
+      {mobileMenuOpen && (
+        <div className="border-t border-border/40 bg-background md:hidden">
+          <div className="px-2 py-2 space-y-1">
+            {navigationItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
     </header>
-    </>
   )
 }
