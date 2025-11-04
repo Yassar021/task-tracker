@@ -130,7 +130,9 @@ export default function AdminDashboard() {
         // Check Supabase session first
         const currentUser = await getCurrentUser();
         if (!currentUser) {
-          window.location.href = "/sign-in";
+          // Don't redirect manually - let middleware handle it
+          setAccessDenied(true);
+          setIsCheckingAuth(false);
           return;
         }
 
@@ -150,7 +152,10 @@ export default function AdminDashboard() {
 
       } catch (error) {
         console.error('Authentication check failed:', error);
-        window.location.href = "/sign-in";
+        // Don't redirect manually - let middleware handle it
+        setAccessDenied(true);
+        setIsCheckingAuth(false);
+        return;
       } finally {
         setIsCheckingAuth(false);
       }
@@ -184,7 +189,12 @@ export default function AdminDashboard() {
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-            <p className="text-muted-foreground">Hanya administrator yang dapat mengakses halaman ini.</p>
+            <p className="text-muted-foreground mb-4">
+              {user ? "Hanya administrator yang dapat mengakses halaman ini." : "Silakan login terlebih dahulu."}
+            </p>
+            <Button onClick={() => window.location.href = "/sign-in"}>
+              Login
+            </Button>
           </CardContent>
         </Card>
       </div>
