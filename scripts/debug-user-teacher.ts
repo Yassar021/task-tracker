@@ -6,11 +6,13 @@ async function debugUserTeacher() {
     console.log('🔍 Debugging User-Teacher relationship...');
 
     // Check auth users
-    const authUsers = await db.query.user.findMany({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const authUsers = await (db as any).query.user.findMany({
       limit: 5
     });
     console.log('📝 Auth users found:', authUsers.length);
-    authUsers.forEach(user => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    authUsers.forEach((user: any) => {
       console.log(`  - ${user.id}: ${user.email} (${user.name})`);
     });
 

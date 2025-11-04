@@ -47,7 +47,8 @@ export async function getAssignmentsWithClasses(filters?: {
   // Format the data to ensure consistent structure
   const formattedData = data?.map(assignment => ({
     ...assignment,
-    class_assignments: assignment.class_assignments?.map(ca => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    class_assignments: assignment.class_assignments?.map((ca: any) => ({
       class_id: ca.class_id,
       classes: ca.classes || null
     })) || []

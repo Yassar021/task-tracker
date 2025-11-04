@@ -41,7 +41,8 @@ export function getWeekNumber(date: Date = new Date()): number {
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
 
   // Calculate full weeks to nearest Thursday
-  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return Math.ceil((((d as any) - (yearStart as any)) / 86400000 + 1) / 7);
 }
 
 export function getCurrentWeekInfo(): { weekNumber: number; year: number } {

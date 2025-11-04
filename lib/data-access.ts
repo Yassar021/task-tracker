@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-implicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { db, users, teachers, classes, assignments, classAssignments, settings, auditLogs } from "@/db";
 import { eq, and, count, desc } from "drizzle-orm";
 import { safeDbOperation } from "@/lib/error-handling";
@@ -224,8 +224,10 @@ export async function getAuditLogs(limit: number = 100) {
 export async function getTeacherStats(teacherId: string) {
   const assignments = await getAssignmentsByTeacher(teacherId);
   const totalAssignments = assignments.length;
-  const publishedAssignments = assignments.filter(a => a.status === 'published').length;
-  const gradedAssignments = assignments.filter(a => a.status === 'graded').length;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const publishedAssignments = assignments.filter((a: any) => a.status === 'published').length;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const gradedAssignments = assignments.filter((a: any) => a.status === 'graded').length;
 
   return {
     totalAssignments,

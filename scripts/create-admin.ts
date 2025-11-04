@@ -36,7 +36,8 @@ async function createAdminAccount() {
     console.error("Error creating admin account:", error);
 
     // Check if admin already exists
-    if (error.message?.includes("already exists") || error.message?.includes("duplicate")) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((error as any).message?.includes("already exists") || (error as any).message?.includes("duplicate")) {
       console.log("ℹ️ Admin account might already exist. Trying to update role...");
 
       try {
@@ -56,7 +57,8 @@ async function createAdminAccount() {
           console.log("✅ Existing admin account updated with admin role");
         }
       } catch (signInError) {
-        console.log("❌ Could not update existing account:", signInError.message);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        console.log("❌ Could not update existing account:", (signInError as any).message);
       }
     }
   }

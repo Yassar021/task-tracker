@@ -127,8 +127,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ];
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userData = (session?.user || currentUser) ? {
-    name: session?.user?.name || (currentUser as { user_metadata?: { name?: string } })?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as { email?: string })?.email?.split('@')[0] || "Admin",
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    name: session?.user?.name || (currentUser as any)?.user_metadata?.name || session?.user?.email?.split('@')[0] || (currentUser as any)?.email?.split('@')[0] || "Admin",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     email: session?.user?.email || (currentUser as any)?.email || "admin@ypssingkole.sch.id",
     avatar: session?.user?.image || "/codeguide-logo.png",

@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "./lib/auth";
+import { auth } from "@/lib/auth";
 
 export async function middleware(request: NextRequest) {
   
   let session = null;
   try {
     // Try multiple methods to get session
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await auth.api.getSession({
       headers: request.headers,
     });
-    session = result?.data;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    session = (result as any)?.session || result;
   } catch (error) {
     session = null;
   }

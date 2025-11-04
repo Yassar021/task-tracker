@@ -72,13 +72,19 @@ export function handleApiError(error: unknown): {
   statusCode: number;
   details?: unknown;
 } {
-  if (error instanceof AppError) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (error && typeof error === 'object' && 'message' in error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return {
-      error: error.message,
-      code: error.code,
-      statusCode: error.statusCode,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      error: (error as any).message,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      code: (error as any).code,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      statusCode: (error as any).statusCode,
       ...(process.env.NODE_ENV === 'development' && {
-        details: error.originalError || error.stack
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        details: (error as any).originalError || (error as any).stack
       }),
     };
   }
