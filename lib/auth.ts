@@ -1,34 +1,33 @@
 import { betterAuth } from "better-auth";
+import { createClient } from "@supabase/supabase-js";
 
-// Temporary auth config without database adapter
-// We'll use Supabase directly for auth operations
-const authConfig: Record<string, unknown> = {
-    emailAndPassword: {
-        enabled: true,
-        requireEmailVerification: false, // For school environment, we can disable this
-    },
-    session: {
-        expiresIn: 60 * 60 * 24 * 7, // 7 days
-        updateAge: 60 * 60 * 24, // 1 day
-        cookieCache: {
-            enabled: false, // Disable caching to ensure fresh session checks
-        },
-        // Ensure cookies are properly handled
-        cookiePrefix: "better-auth",
-        // Additional security settings
-        sameSite: "lax",
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-    },
-    account: {
-        accountLinking: {
-            enabled: false,
-        },
-    },
-    experimental: {
-        enabled: true,
-    },
-    // Skip database adapter for now - we'll use Supabase directly
-};
+// Initialize Supabase client for auth
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
-export const auth = betterAuth(authConfig);
+// Simple auth config with Supabase integration
+export const auth = betterAuth({
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+  },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
+    cookieCache: {
+      enabled: false,
+    },
+    cookiePrefix: "better-auth",
+    sameSite: "lax",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+  },
+  socialProviders: {},
+  account: {
+    accountLinking: {
+      enabled: false,
+    },
+  },
+});
