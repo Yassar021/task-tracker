@@ -7,17 +7,17 @@ import * as schoolSchema from './schema/school';
 // Handle missing database gracefully
 let db: ReturnType<typeof drizzle> | null = null;
 
-// Force offline mode for now to prevent connection issues
-const OFFLINE_MODE = process.env.NODE_ENV === 'production' ? false : true;
+// Check for offline mode or missing database
+const OFFLINE_MODE = process.env.OFFLINE_MODE === 'true' || !(process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL || process.env.DATABASE_URL);
 
 if (OFFLINE_MODE) {
   console.warn('🔌 Running in OFFLINE MODE - database features disabled');
-} else if (process.env.DATABASE_URL) {
+} else if (process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL || process.env.DATABASE_URL) {
   try {
     console.log('Initializing database connection...');
 
     // Parse database URL and create connection config manually for better control
-    const dbUrl = process.env.DATABASE_URL;
+    const dbUrl = process.env.POSTGRES_URL_NON_POOLING || process.env.POSTGRES_URL || process.env.DATABASE_URL;
     console.log('Raw DATABASE_URL:', dbUrl ? 'Set' : 'Not set');
 
     let config;
