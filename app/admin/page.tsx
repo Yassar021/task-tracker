@@ -127,32 +127,50 @@ export default function AdminDashboard() {
       setIsCheckingAuth(true);
 
       try {
-        // Check Supabase session first
-        const currentUser = await getCurrentUser();
-        if (!currentUser) {
-          // Don't redirect manually - let middleware handle it
-          setAccessDenied(true);
-          setIsCheckingAuth(false);
-          return;
-        }
+        // Check Better Auth session first
+        if (!session?.user?.id) {
+          console.log('No Better Auth session found');
+          // Try Supabase as fallback
+          const supabaseUser = await getCurrentUser();
+          if (!supabaseUser) {
+            setAccessDenied(true);
+            setIsCheckingAuth(false);
+            return;
+          }
 
-        // Check if user is admin
-        const adminCheck = await isAdmin();
-        if (!adminCheck) {
-          setAccessDenied(true);
-          setIsCheckingAuth(false);
-          return;
-        }
+          // Check if Supabase user is admin
+          const adminCheck = await isAdmin();
+          if (!adminCheck) {
+            setAccessDenied(true);
+            setIsCheckingAuth(false);
+            return;
+          }
 
-        setUser(currentUser);
-        setAccessDenied(false);
+          setUser(supabaseUser);
+          setAccessDenied(false);
+        } else {
+          // Check if Better Auth user is admin
+          const userEmail = session?.user?.email;
+          const isSupabaseAdmin = userEmail === "admin@ypssingkole.sch.id";
+          const isAdminUser = (session?.user as { role?: string })?.role === "admin" || isSupabaseAdmin;
+
+          console.log('Auth check:', { userEmail, isAdminUser, session });
+
+          if (!isAdminUser) {
+            setAccessDenied(true);
+            setIsCheckingAuth(false);
+            return;
+          }
+
+          setUser(session.user);
+          setAccessDenied(false);
+        }
 
         // Fetch dashboard data
         fetchDashboardData();
 
       } catch (error) {
         console.error('Authentication check failed:', error);
-        // Don't redirect manually - let middleware handle it
         setAccessDenied(true);
         setIsCheckingAuth(false);
         return;
@@ -162,7 +180,7 @@ export default function AdminDashboard() {
     };
 
     checkAuthentication();
-  }, []);
+  }, [session]); // Re-run when session changes
 
   const fetchDashboardData = async () => {
     try {
@@ -189,9 +207,21 @@ export default function AdminDashboard() {
           <CardContent className="pt-6 text-center">
             <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-2">
               {user ? "Hanya administrator yang dapat mengakses halaman ini." : "Silakan login terlebih dahulu."}
             </p>
+
+            {/* Debug info - remove in production */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-800 rounded text-xs text-left">
+                <p><strong>Debug Info:</strong></p>
+                <p>Has user: {user ? 'Yes' : 'No'}</p>
+                <p>Has session: {session ? 'Yes' : 'No'}</p>
+                <p>Email: {session?.user?.email || 'N/A'}</p>
+                <p>Role: {(session?.user as { role?: string })?.role || 'N/A'}</p>
+              </div>
+            )}
+
             <Button onClick={() => window.location.href = "/sign-in"}>
               Login
             </Button>
