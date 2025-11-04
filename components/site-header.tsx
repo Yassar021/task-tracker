@@ -27,11 +27,7 @@ import {
   Moon,
   Sun,
   Menu,
-  X,
-  Bell,
-  Search,
-  Plus,
-  UserPlus
+  X
 } from "lucide-react"
 
 export function SiteHeader() {
@@ -45,24 +41,38 @@ export function SiteHeader() {
   const handleLogout = async () => {
     setIsLoggingOut(true)
     try {
-      // Logout from Better Auth
-      await signOut({
-        fetchOptions: {
-          onSuccess: () => {
-            // Also logout from Supabase
-            supabaseSignOut()
-            toast.success("Berhasil keluar", {
-              description: "Anda telah keluar dari sistem",
-            })
-            window.location.href = "/"
-          },
-          onError: (ctx) => {
-            toast.error("Gagal keluar", {
-              description: ctx.error.message || "Terjadi kesalahan saat keluar",
-            })
-          },
-        },
+      // Try to logout from Better Auth first
+      try {
+        await signOut()
+      } catch (betterAuthError) {
+        console.warn("Better Auth logout failed:", betterAuthError)
+      }
+
+      // Always try to logout from Supabase as fallback
+      try {
+        await supabaseSignOut()
+      } catch (supabaseError) {
+        console.warn("Supabase logout failed:", supabaseError)
+      }
+
+      // Clear any remaining session data
+      try {
+        // Clear Better Auth session storage
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('better-auth.session_token')
+          sessionStorage.removeItem('better-auth.session_token')
+        }
+      } catch (clearError) {
+        console.warn("Failed to clear session storage:", clearError)
+      }
+
+      toast.success("Berhasil keluar", {
+        description: "Anda telah keluar dari sistem",
       })
+
+      // Redirect to home page
+      window.location.href = "/"
+
     } catch (error) {
       console.error("Logout error:", error)
       toast.error("Gagal keluar", {
@@ -113,6 +123,17 @@ export function SiteHeader() {
   }
 
   const getNavigationItems = () => {
+    // Always show admin navigation for admin pages
+    if (pathname.includes('/admin')) {
+      return [
+        { href: "/admin", label: "Dashboard", icon: Home },
+        { href: "/admin/assignments", label: "Tugas", icon: FileText },
+        { href: "/admin/analytics", label: "Statistik", icon: BarChart3 },
+        // { href: "/admin/classes", label: "Kelas", icon: BookOpen },
+        // { href: "/admin/settings", label: "Pengaturan", icon: Settings },
+      ];
+    }
+
     // Check if user is logged in (either Better Auth or Supabase)
     if (!session?.user?.id) {
       return [];
@@ -127,9 +148,9 @@ export function SiteHeader() {
         { href: "/admin", label: "Dashboard", icon: Home },
         { href: "/admin/assignments", label: "Tugas", icon: FileText },
         { href: "/admin/analytics", label: "Statistik", icon: BarChart3 },
-        { href: "/admin/classes", label: "Kelas", icon: BookOpen },
-        { href: "/admin/settings", label: "Pengaturan", icon: Settings },
-      ]
+        // { href: "/admin/classes", label: "Kelas", icon: BookOpen },
+        // { href: "/admin/settings", label: "Pengaturan", icon: Settings },
+      ];
     }
 
     // Teacher navigation
@@ -154,11 +175,11 @@ export function SiteHeader() {
   const navigationItems = getNavigationItems()
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Top Bar */}
       <div className="flex h-16 items-center gap-4 px-4 lg:px-6">
-        {/* Modern Logo & Title */}
-        <div className="flex items-center gap-3 flex-1">
+        {/* Left Side - Logo & Title */}
+        <div className="flex items-center gap-3 flex-shrink-0">
           <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br ${pageInfo.gradient} text-white shadow-lg`}>
             <span className="text-sm font-bold">YPS</span>
           </div>
@@ -168,25 +189,58 @@ export function SiteHeader() {
           </div>
         </div>
 
+        {/* Center - Desktop Navigation */}
+        <div className="flex-1 flex justify-center">
+          <nav className="hidden md:flex items-center gap-6">
+            {navigationItems.map((item) => {
+              const Icon = item.icon
+              const isActive = pathname === item.href
+
+              // Check if this is a disabled feature
+              const isDisabled = item.href === "/admin/classes" || item.href === "/admin/settings"
+
+              return (
+                <div key={item.href} className="relative group">
+                  {isDisabled ? (
+                    <div
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors cursor-not-allowed opacity-50 ${
+                        isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </div>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors hover:text-foreground ${
+                        isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  )}
+
+                  {/* Tooltip for disabled items */}
+                  {isDisabled && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      Fitur dinonaktifkan
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-t-4 border-t-gray-900"></div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </nav>
+        </div>
+
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
-          {/* Search Button */}
-          <Button variant="ghost" size="sm" className="hidden md:flex items-center gap-2">
-            <Search className="h-4 w-4" />
-            <span>Cari...</span>
-          </Button>
-
-          {/* Notifications */}
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-red-500"></span>
-          </Button>
-
-          {/* Add New Button */}
-          <Button variant="ghost" size="sm">
-            <Plus className="h-4 w-4" />
-          </Button>
-
           {/* Theme Toggle */}
           <Button
             variant="ghost"
@@ -273,7 +327,26 @@ export function SiteHeader() {
             {navigationItems.map((item) => {
               const Icon = item.icon
               const isActive = pathname === item.href
-              return (
+              const isDisabled = item.href === "/admin/classes" || item.href === "/admin/settings"
+
+              return isDisabled ? (
+                <div
+                  key={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all opacity-50 cursor-not-allowed ${
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <div className="flex-1">
+                    {item.label}
+                  </div>
+                  <span className="text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+                    Dinonaktifkan
+                  </span>
+                </div>
+              ) : (
                 <Link
                   key={item.href}
                   href={item.href}

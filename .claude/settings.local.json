@@ -27,7 +27,8 @@
       "Bash(echo:*)",
       "WebFetch(domain:task-tracker-yps.vercel.app)",
       "Bash(openssl:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(cmd /c \"rmdir /s /q .next\")"
     ],
     "deny": [],
     "ask": []

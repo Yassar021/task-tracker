@@ -103,7 +103,7 @@ body {
   /* Ensure proper sidebar behavior on md screens and up */
   [data-slot="sidebar-container"] {
     position: fixed !important;
-    z-index: 40 !important;
+    z-index: 30 !important;
   }
 
   /* Sidebar trigger visibility */
@@ -119,7 +119,7 @@ body {
   /* Sidebar rail positioning */
   [data-sidebar="rail"] {
     position: fixed !important;
-    z-index: 39 !important;
+    z-index: 29 !important;
   }
 
   /* Sidebar width transitions */
@@ -174,7 +174,7 @@ body {
 @media (max-width: 767px) {
   [data-slot="sidebar-container"] {
     position: fixed !important;
-    z-index: 50 !important;
+    z-index: 40 !important;
   }
 
   [data-slot="sidebar-inset"] {

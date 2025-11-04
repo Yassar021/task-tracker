@@ -11,7 +11,7 @@ export default function AdminLayout({
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <main className="flex-1">
-        <div className="space-y-6 p-6 pt-6">
+        <div className="space-y-6 p-6 pt-24">
           {children}
         </div>
       </main>

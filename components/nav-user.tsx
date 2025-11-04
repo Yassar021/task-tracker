@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { signOut } from "@/lib/auth-client"
+import { signOut } from "@/lib/client-auth"
 import { toast } from "sonner"
 import {
   IconLogout,

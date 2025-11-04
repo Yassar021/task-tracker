@@ -11,17 +11,28 @@ export function middleware(request: NextRequest) {
   const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path))
   const isAuthPath = authPaths.some((path) => pathname.startsWith(path))
 
-  // Get session token from cookies
-  const sessionToken = request.cookies.get('better-auth.session_token')?.value
+  // Get all cookies to check for session
+  const cookies = request.cookies.getAll();
+
+  // Check for various possible session cookie names
+  const sessionCookie = cookies.find(cookie =>
+    cookie.name.startsWith('better-auth') ||
+    cookie.name === 'session' ||
+    cookie.name.includes('auth')
+  );
+
+  const sessionToken = sessionCookie?.value;
 
   // If trying to access protected routes without session, redirect to sign-in
   if (isProtectedPath && !sessionToken) {
-    return NextResponse.redirect(new URL('/sign-in', request.url))
+    console.log('No session found, redirecting to sign-in');
+    return NextResponse.redirect(new URL('/sign-in', request.url));
   }
 
   // If authenticated user tries to access sign-in page, redirect to admin
   if (isAuthPath && sessionToken) {
-    return NextResponse.redirect(new URL('/admin', request.url))
+    console.log('Session found, redirecting to admin');
+    return NextResponse.redirect(new URL('/admin', request.url));
   }
 
   return NextResponse.next()
